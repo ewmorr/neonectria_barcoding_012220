@@ -2,11 +2,11 @@
 #itsxpress is run after primer removal and quality filtering but before dada2 core algorithm
 #itsxpress is run outside of R
 
-library(dada2)
+require(dada2)
 packageVersion("dada2")
-library(ShortRead)
+require(ShortRead)
 packageVersion("ShortRead")
-library(Biostrings)
+require(Biostrings)
 packageVersion("Biostrings")
 
 seqDir = "R1_R2_switched"
@@ -23,8 +23,8 @@ fnRs <- sort(list.files(seqDir, pattern = "_R2_001.fastq.gz", full.names = TRUE)
 #FWD = "NNNNNNAACTTTYRRCAAYGGATCWCT" #5.8S
 
 #We give the primers WITHOUT the leading Ns (i.e. random bases) because these are *presumably* pretty hard to search for. This is confirmed by seraching for the primers, where more hits are found without the Ns. The leading Ns will be clipped in the process of primer clipping (everything 5' is trimmed)
-REV = "AGCCTCCGCTTATTGATATGCTTAART" #LSU
-FWD = "AACTTTYRRCAAYGGATCWCT" #5.8S
+REV = "AGCCTCCGCTTATTGATATGCTTAART" #28S primer
+FWD = "AACTTTYRRCAAYGGATCWCT" #5.8S primer
 
 #reverse, complement, and RC the primers
 allOrients <- function(primer) {
@@ -144,7 +144,7 @@ filtRs <- file.path(path.cut, "filtered", basename(cutRs))
 out <- filterAndTrim(cutFs, filtFs, cutRs, filtRs, maxN = 0, maxEE = c(2, 2),
 truncQ = 2, minLen = 50, rm.phix = TRUE, compress = TRUE, multithread = TRUE)  # on windows, set multithread = FALSE
 head(out)
-
+saveRDS(out, file = "read_filtering_read_counts.rds")
 
 # sort filtered read files
 filtFs <- sort(list.files(path.cut, pattern = "_R1_001.fastq.gz", full.names = TRUE))

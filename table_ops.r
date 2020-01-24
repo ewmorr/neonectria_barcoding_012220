@@ -21,7 +21,7 @@ metadata_map = read.table("metadata.txt", header = T)
 #this maintains ordering for microDecon, blank samples
 metadata_ordered = full_join(metadata_map, id_bench_map)
 
-#track.long$sample = paste0("X", track.long$sample)
+track.long$sample = paste0("X", track.long$sample)
 track.long.bench = full_join(track.long, id_bench_map, by = "sample")
 track.long.bench.meta = full_join(track.long.bench, metadata_map, by = "metadata.label")
 
