@@ -66,13 +66,13 @@ x = rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.filtN[[1]
 FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.filtN[[1]]),
 REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs.filtN[[1]]),
 REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.filtN[[1]]))
-write.csv(x, "pre_trimming_primer_check.csv")
+write.csv(x, "dada2_processing_tables_figs/pre_trimming_primer_check.csv")
 
 
 #Vis read quality
 #If running on a large sample set should index the filename object to [1:25] otherwise will be unreadable
 
-pdf("read_quality_pre_cutadapt.pdf")
+pdf("dada2_processing_tables_figs/read_quality_pre_cutadapt.pdf")
 print(plotQualityProfile(fnFs.filtN[1:25]))
 print(plotQualityProfile(fnRs.filtN[1:25]))
 dev.off()
@@ -114,7 +114,7 @@ xx = rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.cut[[1]]
 FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.cut[[1]]),
 REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs.cut[[1]]),
 REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.cut[[1]]))
-write.csv(xx, "post_trimming_primer_cehck.csv")
+write.csv(xx, "dada2_processing_tables_figs/post_trimming_primer_cehck.csv")
 
 
 # sort cutadapted read files
@@ -128,7 +128,7 @@ head(sample.names)
 
 
 #Vis read quality
-pdf("read_quality_pre_dada2_qual_filtering.pdf")
+pdf("dada2_processing_tables_figs/read_quality_pre_dada2_qual_filtering.pdf")
 print(plotQualityProfile(cutFs[1:25]) )
 print(plotQualityProfile(cutRs[1:25]) )
 dev.off()
@@ -144,14 +144,14 @@ filtRs <- file.path(path.cut, "filtered", basename(cutRs))
 out <- filterAndTrim(cutFs, filtFs, cutRs, filtRs, maxN = 0, maxEE = c(2, 2),
 truncQ = 2, minLen = 50, rm.phix = TRUE, compress = TRUE, multithread = TRUE)  # on windows, set multithread = FALSE
 head(out)
-saveRDS(out, file = "read_filtering_read_counts.rds")
+saveRDS(out, file = "intermediate_RDS/read_filtering_read_counts.rds")
 
 # sort filtered read files
 filtFs <- sort(list.files(path.cut, pattern = "_R1_001.fastq.gz", full.names = TRUE))
 filtRs <- sort(list.files(path.cut, pattern = "_R2_001.fastq.gz", full.names = TRUE))
 
 #Vis read quality of filtered reads
-pdf("read_quality_post_dada2_qual_filtering.pdf")
+pdf("dada2_processing_tables_figs/read_quality_post_dada2_qual_filtering.pdf")
 print(plotQualityProfile(filtFs[1:25]))
 print(plotQualityProfile(filtRs[1:25]))
 dev.off()

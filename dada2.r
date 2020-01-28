@@ -28,7 +28,7 @@ itsRs.len <- file.path(path.len, basename(itsRs))
 out2 <- filterAndTrim(itsFs, itsFs.len, itsRs, itsRs.len, maxN = 0, maxEE = c(2, 2),
 truncQ = 2, minLen = 10, rm.phix = TRUE, compress = TRUE, multithread = TRUE)  # on windows, set multithread = FALSE
 head(out2)
-saveRDS(out2, "read_filtering_read_counts_2.rds")
+saveRDS(out2, "intermediate_RDS/read_filtering_read_counts_2.rds")
 
 # sort filtered read files
 itsFs.len <- sort(list.files(path.len, pattern = "_R1_001.fastq.gz", full.names = TRUE))
@@ -37,7 +37,7 @@ itsRs.len <- sort(list.files(path.len, pattern = "_R2_001.fastq.gz", full.names 
 
 #Vis read quality of its-extracted reads
 #If running on a large sample set should index the filename object to [1:25] otherwise will be unreadable
-pdf("read_quality_post_its_extraction.pdf")
+pdf("dada2_processing_tables_figs/read_quality_post_its_extraction.pdf")
 print(plotQualityProfile(itsFs.len[1:25]))
 print(plotQualityProfile(itsRs.len[1:25]))
 dev.off()
@@ -50,7 +50,7 @@ errF <- learnErrors(itsFs.len, multithread = TRUE)
 errR <- learnErrors(itsRs.len, multithread = TRUE)
 
 #Viz
-pdf("error_rate_graphs.pdf")
+pdf("dada2_processing_tables_figs/error_rate_graphs.pdf")
 print(plotErrors(errF, nominalQ = TRUE))
 print(plotErrors(errR, nominalQ = TRUE))
 dev.off()
@@ -81,15 +81,15 @@ dim(seqtab)
 
 #remove chimeras
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
-saveRDS(seqtab.nochim, file = "dada2_seq_table_no_chim.rds")
+saveRDS(seqtab.nochim, file = "intermediate_RDS/dada2_seq_table_no_chim.rds")
 
 #These files saved only for sequence counting purposes in "dada2_tables_to_file
 getN <- function(x) sum(getUniques(x))
 
 denoisedF.getN = data.frame(denoisedF = sapply(dadaFs, getN), sample = rownames(data.frame(sapply(dadaFs, getN))))
-saveRDS(denoisedF.getN, "denoisedF.getN.df.rds")
+saveRDS(denoisedF.getN, "intermediate_RDS/denoisedF.getN.df.rds")
 denoisedR.getN = data.frame(denoisedR = sapply(dadaRs, getN), sample = rownames(data.frame(sapply(dadaRs, getN))))
-saveRDS(denoisedR.getN, "denoisedR.getN.df.rds")
+saveRDS(denoisedR.getN, "intermediate_RDS/denoisedR.getN.df.rds")
 mergers.getN = data.frame(merged = sapply(mergers, getN), sample = rownames(data.frame(sapply(mergers, getN))))
-saveRDS(mergers.getN, "mergers.getN.df.rds")
+saveRDS(mergers.getN, "intermediate_RDS/mergers.getN.df.rds")
 

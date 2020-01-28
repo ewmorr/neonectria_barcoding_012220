@@ -13,6 +13,11 @@ mkdir R1_R2_switched
 for i in original_reads/*R1*; do(DIR=${i%/*}; FILE=${i##*/}; BEFFILE=${FILE%R1*}; AFTFILE=${FILE##*R1}; cp $DIR/${BEFFILE}R1${AFTFILE} ./R1_R2_switched/${BEFFILE}R2${AFTFILE}; cp $DIR/${BEFFILE}R2${AFTFILE} ./R1_R2_switched/${BEFFILE}R1${AFTFILE}); done
 
 ```
+
+```
+mkdir dada2_processing_tables_figs
+mkdir intermediate_RDS
+```
 Run the pre-processing script.
 ```
 Rscript ~/repo/neonectria_barcoding_012220/rm_primers_and_qual_filter.r
@@ -69,6 +74,7 @@ Rscript ~/repo/neonectria_barcoding_012220/UNITE_taxonomic_classification.r
 ```
 write tables to file and make plots
 ```
+mkdir dada2_out
 Rscript ~/repo/neonectria_barcoding_012220/dada2_tables_to_file.r
 ```
 
