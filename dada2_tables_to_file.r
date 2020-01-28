@@ -53,6 +53,7 @@ source("../ggplot_theme.txt")
 get.sample.name <- function(fname) strsplit(basename(fname), "_L00")[[1]][1]
 
 #modified from the original dada2 tracking table so can handle different numbers of rows (samples that are dropped)
+out.filtN = readRDS("intermediate_RDS/read_filtering_read_counts.filtN.rds")
 out = readRDS("intermediate_RDS/read_filtering_read_counts.rds")
 out2 = readRDS("intermediate_RDS/read_filtering_read_counts_2.rds")
 colnames(out) = c ("input", "filtered")

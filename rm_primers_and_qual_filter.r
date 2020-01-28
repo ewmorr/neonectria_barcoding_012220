@@ -43,8 +43,8 @@ FWD.orients
 #remove reads with Ns
 fnFs.filtN <- file.path(seqDir, "filtN", basename(fnFs)) # Put N-filterd files in filtN/ subdirectory
 fnRs.filtN <- file.path(seqDir, "filtN", basename(fnRs))
-filterAndTrim(fnFs, fnFs.filtN, fnRs, fnRs.filtN, maxN = 0, multithread = TRUE)
-
+out.filtN = filterAndTrim(fnFs, fnFs.filtN, fnRs, fnRs.filtN, maxN = 0, multithread = TRUE)
+saveRDS(out.filtN, "intermediate_RDS/read_filtering_read_counts.filtN.rds")
 #Reset the filename lists in case files are lost at trimming
 seqDir = "R1_R2_switched/filtN"
 list.files(seqDir)
@@ -86,8 +86,8 @@ system2(cutadapt, args = "--version")
 #make files
 path.cut <- file.path(seqDir, "cutadapt")
 if(!dir.exists(path.cut)) dir.create(path.cut)
-fnFs.cut <- file.path(path.cut, basename(fnFs))
-fnRs.cut <- file.path(path.cut, basename(fnRs))
+fnFs.cut <- file.path(path.cut, basename(fnFs.filtN)) #THIS needs to be changed to .filtN!!!
+fnRs.cut <- file.path(path.cut, basename(fnRs.filtN))
 
 #reverse complement primers
 FWD.RC <- dada2:::rc(FWD)
@@ -100,7 +100,7 @@ R1.flags <- paste("-g", FWD, "-a", REV.RC)
 R2.flags <- paste("-G", REV, "-A", FWD.RC)
 # Run Cutadapt
 #added min len filter bc cutadapt was leaving some empty entries
-for(i in seq_along(fnFs)) {
+for(i in seq_along(fnFs.filtN)) {
 	system2(cutadapt, args = c(R1.flags, R2.flags, "-n", 2, # -n 2 required to remove FWD and REV from reads
     "--minimum-length", 50,
 	"-o", fnFs.cut[i], "-p", fnRs.cut[i], # output files
@@ -114,7 +114,7 @@ xx = rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.cut[[1]]
 FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.cut[[1]]),
 REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs.cut[[1]]),
 REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.cut[[1]]))
-write.csv(xx, "dada2_processing_tables_figs/post_trimming_primer_cehck.csv")
+write.csv(xx, "dada2_processing_tables_figs/post_trimming_primer_check.csv")
 
 
 # sort cutadapted read files
