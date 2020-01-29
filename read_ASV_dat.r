@@ -1,4 +1,5 @@
 require(tidyverse)
+require(data.table)
 get.sample.name <- function(fname) strsplit(basename(fname), "_[ATCG]{8}(-|\\.)[ATCG]{8}", perl = T)[[1]][1]
 
 #read data
@@ -21,6 +22,24 @@ metadata_ordered = full_join(metadata_map, id_bench_map)
 survey_dat.neo_cov = full_join(survey_dat, neo_cov, by = c("Site", "Tree", "Plug")) %>% left_join(., site_info, by = "Site")
 
 full_metadata = full_join(metadata_ordered, survey_dat.neo_cov, by = c("Site", "Tree", "Plug"))
+
+######################################
+#Negative & control samples table with taxonomy#
+
+#make negatives only asv_tab (long format)
+asv_tab.negatives = semi_join(
+    data.frame(sample = rownames(t(asv_tab)), t(asv_tab)),
+    full_metadata %>% filter(bench.control != "n")
+)
+rownames(asv_tab.negatives) = asv_tab.negatives$sample
+asv_tab.negatives$sample = NULL
+asv_tab.negatives = t(asv_tab.negatives)
+#join with taxonomy
+asv_tab.negatives.asvnames = data.frame(ASV = rownames(asv_tab.negatives), asv_tab.negatives)
+
+asv_tab.negatives.long = melt(asv_tab.negatives.asvnames[rowSums(asv_tab.negatives) > 0,] %>% data.table,
+id = "ASV", variable.name = "sample", value.name = "count") %>%
+data.frame
 
 #############################
 #Nf and Nd counts (sum ASVs)#

@@ -10,7 +10,7 @@ packageVersion("ShortRead")
 library(Biostrings)
 packageVersion("Biostrings")
 
-seqDir = "/Users/ericmorrison/GARNAS_neonectria_barcoding_012220/R1_R2_switched/itsxpress"
+seqDir = "R1_R2_switched/itsxpress"
 list.files(seqDir)
 
 #parse and sort file names, adjust regex as needed

@@ -56,30 +56,34 @@ get.sample.name <- function(fname) strsplit(basename(fname), "_L00")[[1]][1]
 out.filtN = readRDS("intermediate_RDS/read_filtering_read_counts.filtN.rds")
 out = readRDS("intermediate_RDS/read_filtering_read_counts.rds")
 out2 = readRDS("intermediate_RDS/read_filtering_read_counts_2.rds")
-colnames(out) = c ("input", "filtered")
+colnames(out.filtN) = c("input", "N_filtered")
+colnames(out) = c ("cutadapt", "quality_filtered")
 colnames(out2) = c ("itsxextracted", "gt_10_len")
 
+rownames(out.filtN) = unname(sapply(rownames(out.filtN), get.sample.name))
 rownames(out) = unname(sapply(rownames(out), get.sample.name))
 rownames(out2) = unname(sapply(rownames(out2), get.sample.name))
 
 #Track reads through the pipeline
 
-track = full_join(data.frame(out, sample = rownames(out)), data.frame(out2, sample = rownames(out2)), by = "sample") %>%
+track = full_join(data.frame(out.filtN, sample = rownames(out.filtN)), data.frame(out, sample = rownames(out))) %>%
+full_join(., data.frame(out2, sample = rownames(out2)), by = "sample") %>%
 full_join(., readRDS("intermediate_RDS/denoisedF.getN.df.rds"), by = "sample") %>%
 full_join(., readRDS("intermediate_RDS/denoisedR.getN.df.rds"), by = "sample") %>%
 full_join(., readRDS("intermediate_RDS/mergers.getN.df.rds"), by = "sample") %>%
-full_join(., data.frame(nonchim = rowSums(seqtab.nochim), sample = rownames(data.frame(rowSums(seqtab.nochim)))), by = "sample")
+full_join(., data.frame(nonchim = rowSums(seqtab.nochim), sample = rownames(data.frame(rowSums(seqtab.nochim)))), by = "sample") %>%
+replace(., is.na(.), 0)
 
 track.long = track %>% arrange(desc(input)) %>% gather(., "step", "count", -sample)
-track.long$step = factor(track.long$step, levels = c("input", "filtered", "itsxextracted", "gt_10_len", "denoisedF", "denoisedR", "merged",
+track.long$step = factor(track.long$step, levels = c("input", "N_filtered", "cutadapt", "quality_filtered", "itsxextracted", "gt_10_len", "denoisedF", "denoisedR", "merged",
 "nonchim"))
 
 write.csv(track.long, "dada2_processing_tables_figs/read_processing_tracking.csv")
 
 #Plot read counts per step
 
-p1 = ggplot(track.long %>% filter(step != "gt_10_len" & step != "denoisedR" & count > 0), aes(x = reorder(sample, -count), y = count, color = step)) +
-geom_point() +
+p1 = ggplot(track.long %>% filter(step != "gt_10_len" & step != "denoisedR"), aes(x = reorder(sample, -count), y = count + 1, color = step)) +
+geom_point(position = position_jitter(width = 0.75, height = 0)) +
 scale_y_log10() +
 scale_color_manual(values = c(cbPalette, "dark grey", "black")) +
 my_gg_theme +
