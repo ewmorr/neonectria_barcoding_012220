@@ -23,7 +23,7 @@ survey_dat.neo_cov = full_join(survey_dat, neo_cov, by = c("Site", "Tree", "Plug
 
 full_metadata = full_join(metadata_ordered, survey_dat.neo_cov, by = c("Site", "Tree", "Plug"))
 
-######################################
+################################################
 #Negative & control samples table with taxonomy#
 
 #make negatives only asv_tab (long format)
@@ -40,6 +40,33 @@ asv_tab.negatives.asvnames = data.frame(ASV = rownames(asv_tab.negatives), asv_t
 asv_tab.negatives.long = melt(asv_tab.negatives.asvnames[rowSums(asv_tab.negatives) > 0,] %>% data.table,
 id = "ASV", variable.name = "sample", value.name = "count") %>%
 data.frame
+
+#################################################
+#Process asv_tax for lowest informative taxonomy#
+
+asv_tax.char = apply(asv_tax, 2, as.character)
+asv_tax.char[is.na(asv_tax.char)] = "unknown"
+rownames(asv_tax.char) = rownames(asv_tax)
+
+get_informative_taxa = function(x){
+    found_info = 0
+    for(i in length(x):2){
+        if(x[i] != "unknown"){
+            if(i == length(x)){
+                return(paste(as.character(x[i-1]), sub("s__", "", as.character(x[i]) ), sep = " " ))
+            }
+            else{
+                return(as.character(x[i]))
+            }
+            found_info = 1
+            break
+        }
+    }
+    if(found_info == 0){return(x[1])}
+}
+
+asv_informative_taxa = vector(mode = "character", length = length(rownames(asv_tax.char)))
+asv_informative_taxa = apply(asv_tax.char, 1, function(x) get_informative_taxa(x))
 
 #############################
 #Nf and Nd counts (sum ASVs)#

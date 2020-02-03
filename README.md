@@ -29,7 +29,7 @@ Next run itsxpress on the filtered reads. This should use the version of itsxpre
 The `hmmsearch` step can take quite a while, so this is one place to use a cluster.
 
 ```
-conda activate itsxpressHack
+conda activate itsxpress_3p
 
 cd ~/GARNAS_neonectria_barcoding_012220/
 INDIR=R1_R2_switched/filtN/cutadapt/filtered
@@ -43,18 +43,18 @@ do(
     AFTFILE=${FILE##*R1}
     R1=$FILE
     R2=${BEFFILE}R2${AFTFILE}
-
+    echo $R1
     if [ -f $OUTDIR/$R2 ]
     then
         continue
     fi
 
-    python ~/repo/itsxpress_mod/itsxpress/main.py \
+    itsxpress \
     --fastq $INDIR/$R1 --fastq2 $INDIR/$R2 \
     --outfile $OUTDIR/$R1 --outfile2 $OUTDIR/$R2 \
     --region ITS2 --taxa 'Fungi' --cluster_id 1 \
     --threads 4 \
-    --log itsxpress.log >> itsxpress.stdout
+    --log itsxpress.log
 )
 done
 ```

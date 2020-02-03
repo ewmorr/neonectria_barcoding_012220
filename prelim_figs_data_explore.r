@@ -1,6 +1,7 @@
 require(tidyverse)
 require(vegan)
 require(gridExtra)
+require(RColorBrewer)
 
 my_gg_theme = theme(
     panel.background = element_rect(fill='white', colour='black'),
@@ -19,7 +20,6 @@ my_gg_theme = theme(
 )
 
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-
 cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 #read data
@@ -29,11 +29,15 @@ source("~/repo/neonectria_barcoding_012220/read_ASV_dat.r")
 #asv_tax
 #id_bench_map
 
-#joins metadata files to get object:
+#joins metadata files to get metadata object:
 #full_metadata
 
-#creates negatvies and controls only asv_tab (long format):
+#creates negatives and controls only asv_tab (long format):
 #asv_tab.negatives.long
+
+#creates new object with lowest informative taxonomic level and a character asv_tax with unknown instead of NA
+#asv_informative_taxa
+#asv_tax.char
 
 #and calculates neonectria occurence in objects:
 #Nf_v_Nd.long.metadata
@@ -41,16 +45,36 @@ source("~/repo/neonectria_barcoding_012220/read_ASV_dat.r")
 
 system("mkdir prelim_figs")
 
-#PLOTS
+#######
+#PLOTS#
 
-ggplot(Nf_v_Nd.long.metadata %>% filter(bench.control != "n"), aes(as.factor(Tree), ..count.., fill = occurence)) +
-geom_histogram(stat = "count", width = 0.9, color = "black") +
-facet_wrap(~Site, scales = "free_x", ncol = 5) +
-scale_fill_manual(values = rev(cbPalette[1:4])) +
-labs(x = "Trees", y = "count (plugs)") +
+#negatives/control by type with taxonomy
+asv.negatives.plot_dat = left_join(asv_tab.negatives.long, full_metadata, by = "sample") %>%
+    left_join(.,
+        data.frame(ASV = names(asv_informative_taxa),
+            taxon = paste(names(asv_informative_taxa), asv_informative_taxa, sep = " ")
+        ),
+    by = "ASV"
+    )
+
+#Get color palette
+palette_len = asv.negatives.plot_dat %>% filter(count > 0) %>% select(taxon) %>% unique %>% rownames %>% length
+getPalette = colorRampPalette(brewer.pal(n = 12, name = "Paired"))
+
+p = ggplot(asv.negatives.plot_dat, aes(x = sample, y = count, fill = taxon)) +
+geom_col(color = "black") +
+facet_wrap(~bench.control, scales = "free") +
+#scale_fill_brewer(palette = "Paired") +
+scale_fill_manual(values = getPalette(palette_len)) +
 my_gg_theme +
-theme(axis.text.x = element_blank())
+theme(
+legend.text = element_text(size = 14),
+axis.text.x = element_text(angle = 55, hjust = 1)
+)
 
+pdf("prelim_figs/controls_stacked_taxa.pdf", width = 12, height = 8)
+print(p)
+dev.off()
 
 #Neo occurence across sites, trees, plugs
 pdf("prelim_figs/Neo_occurence_min_1k_seqs_per_sample.pdf", width = 10)
@@ -126,13 +150,13 @@ Nf_Nd_site_freq.site_info = left_join(Nf_Nd_site_freq, site_info)
 p1 = ggplot(Nf_Nd_site_freq.site_info , aes(lat, Nd/total, group = lat, color = state_prov)) +
 geom_point(size = 3) +
 labs(y = "N. ditissima frequency\n(proportion plugs)", x = "Latitude") +
-scale_color_manual(values = cbPalette, guide = F) +
+scale_color_brewer(palette = "Dark2", guide = F) +
 my_gg_theme
 
 p2 = ggplot(Nf_Nd_site_freq.site_info , aes(lat, Nf/total, group = lat, color = state_prov)) +
 geom_point(size = 3) +
 labs(y = "N. faginata frequency\n(proportion plugs)", x = "Latitude") +
-scale_color_manual(values = cbPalette) +
+scale_color_brewer(palette = "Dark2") +
 my_gg_theme
 
 pdf("prelim_figs/Neonectria_frequency_by_lat_1K_min.pdf", width = 10, height = 4)
@@ -154,7 +178,7 @@ pdf("prelim_figs/ASV_richness_by_lat_1K_min.pdf", width = 8, height = 4)
 ggplot(sample_richness.metadata.site_info , aes(lat, richness, group = lat, color = state_prov)) +
 geom_boxplot(width = .25) +
 labs(y = "ASV richness\nper 1K sequences", x = "Latitude") +
-scale_color_manual(values = cbPalette) +
+scale_color_brewer(palette = "Dark2") +
 my_gg_theme
 dev.off()
 
@@ -226,13 +250,13 @@ Nf_Nd_site_freq.site_info = left_join(Nf_Nd_site_freq, site_info)
 p1 = ggplot(Nf_Nd_site_freq.site_info , aes(lat, Nd/total, group = lat, color = state_prov)) +
 geom_point(size = 3) +
 labs(y = "N. ditissima frequency\n(proportion plugs)", x = "Latitude") +
-scale_color_manual(values = cbPalette, guide = F) +
+scale_color_brewer(palette = "Dark2", guide = F) +
 my_gg_theme
 
 p2 = ggplot(Nf_Nd_site_freq.site_info , aes(lat, Nf/total, group = lat, color = state_prov)) +
 geom_point(size = 3) +
 labs(y = "N. faginata frequency\n(proportion plugs)", x = "Latitude") +
-scale_color_manual(values = cbPalette) +
+scale_color_brewer(palette = "Dark2") +
 my_gg_theme
 
 pdf("prelim_figs/Neonectria_frequency_by_lat_5K_min.pdf", width = 10, height = 4)
@@ -254,7 +278,7 @@ pdf("prelim_figs/ASV_richness_by_lat_5K_min.pdf", width = 8, height = 4)
 ggplot(sample_richness.metadata.site_info , aes(lat, richness, group = lat, color = state_prov)) +
 geom_boxplot(width = .25) +
 labs(y = "ASV richness\nper 5K sequences", x = "Latitude") +
-scale_color_manual(values = cbPalette) +
+scale_color_brewer(palette = "Dark2") +
 my_gg_theme
 dev.off()
 
@@ -262,7 +286,7 @@ pdf("prelim_figs/ASV_richness_by_neo_occurence_5K_min.pdf", width = 8, height = 
 ggplot(sample_richness.metadata.site_info , aes(occurence, richness)) +
 geom_boxplot(width = .25) +
 labs(y = "ASV richness\nper 5K sequences", x = "Neonectria occurence") +
-scale_color_manual(values = cbPalette, guide = F) +
+scale_color_manual(values = cbPalette) +
 scale_x_discrete(labels = c("both", "N. ditissima", "N. faginata", "none")) +
 my_gg_theme
 dev.off()

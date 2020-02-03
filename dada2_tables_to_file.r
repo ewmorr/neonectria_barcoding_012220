@@ -79,6 +79,7 @@ track.long$step = factor(track.long$step, levels = c("input", "N_filtered", "cut
 "nonchim"))
 
 write.csv(track.long, "dada2_processing_tables_figs/read_processing_tracking.csv")
+write.csv(track, "dada2_processing_tables_figs/read_processing_tracking.wide_format.csv")
 
 #Plot read counts per step
 
