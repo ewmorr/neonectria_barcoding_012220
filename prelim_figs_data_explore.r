@@ -80,7 +80,7 @@ dev.off()
 pdf("prelim_figs/Neo_occurence_min_1k_seqs_per_sample.pdf", width = 10)
 ggplot(Nf_v_Nd.bin.metadata %>% filter(total_seqs > 1000), aes(as.factor(Tree), ..count.., fill = occurence)) +
 geom_histogram(stat = "count", width = 0.9, color = "black") +
-facet_wrap(~Site, scales = "free_x", ncol = 5) +
+facet_grid(run.seq~Site, scales = "free_x") +
 scale_fill_manual(values = rev(cbPalette[1:4])) +
 labs(x = "Trees", y = "count (plugs)") +
 my_gg_theme +
@@ -124,6 +124,18 @@ pdf("prelim_figs/NMDS_neo_occurence_by_lat_1Kmin.pdf", width = 8, height = 6)
 p
 dev.off()
 
+p = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = run.seq, shape = occurence)) +
+geom_point(size = 5) +
+my_gg_theme +
+theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
+scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), labels = c("Nd" = "N. ditissima", "Nf" = "N. faginata", "none" = "none", "both" = "both")) +
+scale_color_manual(name = "Run", values = cbPalette)
+
+pdf("prelim_figs/NMDS_neo_occurence_by_run_1Kmin.pdf", width = 8, height = 6)
+p
+dev.off()
+
+
 ##############################
 #Neonectria frequency by site#
 
@@ -144,7 +156,6 @@ for( i in 1:length(sites_nmds$Site)){
     Nf_Nd_site_freq$Site[i] = as.character(sites_nmds$Site[i])
 }
 
-#This line probably not necessary because already added full metadata to NMDS, but haven't tested in this script
 Nf_Nd_site_freq.site_info = left_join(Nf_Nd_site_freq, site_info)
 
 p1 = ggplot(Nf_Nd_site_freq.site_info , aes(lat, Nd/total, group = lat, color = state_prov)) +
@@ -177,6 +188,7 @@ sample_richness.metadata.site_info = left_join(sample_richness.metadata, Nf_v_Nd
 pdf("prelim_figs/ASV_richness_by_lat_1K_min.pdf", width = 8, height = 4)
 ggplot(sample_richness.metadata.site_info , aes(lat, richness, group = lat, color = state_prov)) +
 geom_boxplot(width = .25) +
+facet_wrap(~run.seq) +
 labs(y = "ASV richness\nper 1K sequences", x = "Latitude") +
 scale_color_brewer(palette = "Dark2") +
 my_gg_theme
@@ -185,6 +197,7 @@ dev.off()
 pdf("prelim_figs/ASV_richness_by_neo_occurence_1K_min.pdf", width = 8, height = 4)
 ggplot(sample_richness.metadata.site_info , aes(occurence, richness)) +
 geom_boxplot(width = .25) +
+facet_wrap(~run.seq) +
 labs(y = "ASV richness\nper 1K sequences", x = "Neonectria occurence") +
 scale_color_manual(values = cbPalette, guide = F) +
 scale_x_discrete(labels = c("both", "N. ditissima", "N. faginata", "none")) +
