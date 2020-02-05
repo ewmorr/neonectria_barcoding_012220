@@ -72,7 +72,7 @@ legend.text = element_text(size = 14),
 axis.text.x = element_text(angle = 55, hjust = 1)
 )
 
-pdf("prelim_figs/controls_stacked_taxa.pdf", width = 12, height = 8)
+pdf("prelim_figs/controls_stacked_taxa.pdf", width = 14, height = 8)
 print(p)
 dev.off()
 
