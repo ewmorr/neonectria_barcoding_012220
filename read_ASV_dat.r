@@ -22,7 +22,9 @@ metadata_ordered = full_join(metadata_map, id_bench_map)
 survey_dat.neo_cov = full_join(survey_dat, neo_cov, by = c("Site", "Tree", "Plug")) %>% left_join(., site_info, by = "Site")
 
 full_metadata = full_join(metadata_ordered, survey_dat.neo_cov, by = c("Site", "Tree", "Plug"))
-
+if("seq.rep" %in% colnames(full_metadata)){
+    full_metadata = full_metadata %>% filter(seq.rep != "y")
+}
 ################################################
 #Negative & control samples table with taxonomy#
 
