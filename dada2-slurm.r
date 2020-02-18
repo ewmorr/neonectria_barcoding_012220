@@ -14,8 +14,8 @@ seqDir = "R1_R2_switched/itsxpress"
 list.files(seqDir)
 
 #parse and sort file names, adjust regex as needed
-itsFs <- sort(list.files(seqDir, pattern = "_R1_001.fastq.gz", full.names = TRUE))
-itsRs <- sort(list.files(seqDir, pattern = "_R2_001.fastq.gz", full.names = TRUE))
+itsFs <- sort(list.files(seqDir, pattern = "_R1*.fastq.gz", full.names = TRUE))
+itsRs <- sort(list.files(seqDir, pattern = "_R2*.fastq.gz", full.names = TRUE))
 
 #itsxpress outputs 0 len reads. filter for len
 #make files
@@ -26,13 +26,13 @@ itsRs.len <- file.path(path.len, basename(itsRs))
 
 #filter
 out2 <- filterAndTrim(itsFs, itsFs.len, itsRs, itsRs.len, maxN = 0, maxEE = c(2, 2),
-truncQ = 2, minLen = 10, rm.phix = TRUE, compress = TRUE, multithread = 24)  # on windows, set multithread = FALSE
+truncQ = 2, minLen = 10, rm.phix = TRUE, compress = TRUE, multithread = 16)  # on windows, set multithread = FALSE
 head(out2)
 saveRDS(out2, "intermediate_RDS/read_filtering_read_counts_2.rds")
 
 # sort filtered read files
-itsFs.len <- sort(list.files(path.len, pattern = "_R1_001.fastq.gz", full.names = TRUE))
-itsRs.len <- sort(list.files(path.len, pattern = "_R2_001.fastq.gz", full.names = TRUE))
+itsFs.len <- sort(list.files(path.len, pattern = "_R1*.fastq.gz", full.names = TRUE))
+itsRs.len <- sort(list.files(path.len, pattern = "_R2*.fastq.gz", full.names = TRUE))
 
 
 #Vis read quality of its-extracted reads
@@ -46,8 +46,8 @@ dev.off()
 #At this point the tutorial at https://benjjneb.github.io/dada2/tutorial.html is likely more informative than the ITS specific tutorial
 
 #Learn the error rates
-errF <- learnErrors(itsFs.len, multithread = 24)
-errR <- learnErrors(itsRs.len, multithread = 24)
+errF <- learnErrors(itsFs.len, multithread = 16)
+errR <- learnErrors(itsRs.len, multithread = 16)
 
 #Viz
 pdf("dada2_processing_tables_figs/error_rate_graphs.pdf")
@@ -60,7 +60,7 @@ dev.off()
 derepFs <- derepFastq(itsFs.len, verbose = TRUE)
 derepRs <- derepFastq(itsRs.len, verbose = TRUE)
 
-get.sample.name <- function(fname) strsplit(basename(fname), "_L00")[[1]][1]
+get.sample.name <- function(fname) strsplit(basename(fname), "_")[[1]][1]
 sample.names <- unname(sapply(itsFs.len, get.sample.name))
 
 names(derepFs) <- sample.names
@@ -69,8 +69,8 @@ names(derepRs) <- sample.names
 
 #DADA2 alogorithm
 #pooling samples is not default, but increases sensitivity to low abundance sequences shared across samples
-dadaFs <- dada(derepFs, err = errF, multithread = 24, pool = T)
-dadaRs <- dada(derepRs, err = errR, multithread = 24, pool = T)
+dadaFs <- dada(derepFs, err = errF, multithread = 16, pool = T)
+dadaRs <- dada(derepRs, err = errR, multithread = 16, pool = T)
 
 #merge pairs
 mergers <- mergePairs(dadaFs, derepFs, dadaRs, derepRs, verbose=TRUE, maxMismatch = 0)
