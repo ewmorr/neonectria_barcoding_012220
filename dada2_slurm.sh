@@ -17,8 +17,8 @@ cd ~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_files_cat
 mkdir dada2_processing_tables_figs
 mkdir intermediate_RDS
 
-Rscript ~/repo/neonectria_barcoding_012220/dada2-slurm.r
-Rscript ~/repo/neonectria_barcoding_012220/UNITE_taxonomic_classification-slurm.r
+srun Rscript ~/repo/neonectria_barcoding_012220/dada2-slurm.r
+srun Rscript ~/repo/neonectria_barcoding_012220/UNITE_taxonomic_classification-slurm.r
 
 # next running the non-concatenated files (this is pooled across all run1/run2 samples; the pooling within run only is already done)
 
@@ -26,6 +26,6 @@ cd ~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_files_sep
 mkdir dada2_processing_tables_figs
 mkdir intermediate_RDS
 
-Rscript ~/repo/neonectria_barcoding_012220/dada2-slurm.r
-Rscript ~/repo/neonectria_barcoding_012220/UNITE_taxonomic_classification-slurm.r
+srun Rscript ~/repo/neonectria_barcoding_012220/dada2-slurm.r
+srun Rscript ~/repo/neonectria_barcoding_012220/UNITE_taxonomic_classification-slurm.r
 
