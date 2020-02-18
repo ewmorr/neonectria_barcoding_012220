@@ -14,6 +14,17 @@ Because of issue referenced [here](https://github.com/benjjneb/dada2/issues/417)
 ```
 R
 >if (!requireNamespace("BiocManager", quietly = TRUE))
+install.packages("BiocManager")
+>BiocManager::install("dada2")
+```
+### The above works as of 02/18/2020. Some earlier versions of these programs had bug at install. See below for potential fixes if running into problems...
+
+
+Because of issue referenced [here](https://github.com/benjjneb/dada2/issues/417) an additional comiler
+
+```
+R
+>if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 >BiocManager::install("dada2", version = "3.9")
 ```
