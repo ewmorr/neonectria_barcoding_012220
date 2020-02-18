@@ -53,15 +53,15 @@ source("../ggplot_theme.txt")
 get.sample.name <- function(fname) strsplit(basename(fname), "_L00")[[1]][1]
 
 #modified from the original dada2 tracking table so can handle different numbers of rows (samples that are dropped)
-out.filtN = readRDS("intermediate_RDS/read_filtering_read_counts.filtN.rds")
-out = readRDS("intermediate_RDS/read_filtering_read_counts.rds")
+#out.filtN = readRDS("intermediate_RDS/read_filtering_read_counts.filtN.rds")
+#out = readRDS("intermediate_RDS/read_filtering_read_counts.rds")
 out2 = readRDS("intermediate_RDS/read_filtering_read_counts_2.rds")
-colnames(out.filtN) = c("input", "N_filtered")
-colnames(out) = c ("cutadapt", "quality_filtered")
+#colnames(out.filtN) = c("input", "N_filtered")
+#colnames(out) = c ("cutadapt", "quality_filtered")
 colnames(out2) = c ("itsxextracted", "gt_10_len")
 
-rownames(out.filtN) = unname(sapply(rownames(out.filtN), get.sample.name))
-rownames(out) = unname(sapply(rownames(out), get.sample.name))
+#rownames(out.filtN) = unname(sapply(rownames(out.filtN), get.sample.name))
+#rownames(out) = unname(sapply(rownames(out), get.sample.name))
 rownames(out2) = unname(sapply(rownames(out2), get.sample.name))
 
 #Track reads through the pipeline
