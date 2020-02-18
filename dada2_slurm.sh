@@ -29,3 +29,5 @@ mkdir intermediate_RDS
 srun Rscript ~/repo/neonectria_barcoding_012220/dada2-slurm.r
 srun Rscript ~/repo/neonectria_barcoding_012220/UNITE_taxonomic_classification-slurm.r
 
+conda deactivate
+
