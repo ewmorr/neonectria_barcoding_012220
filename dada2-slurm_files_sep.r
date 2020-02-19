@@ -31,8 +31,8 @@ head(out2)
 saveRDS(out2, "intermediate_RDS/read_filtering_read_counts_2.rds")
 
 # sort filtered read files
-itsFs.len <- sort(list.files(path.len, pattern = "_R1*.fastq.gz", full.names = TRUE))
-itsRs.len <- sort(list.files(path.len, pattern = "_R2*.fastq.gz", full.names = TRUE))
+itsFs.len <- sort(list.files(path.len, pattern = "_R1_001.fastq.gz", full.names = TRUE))
+itsRs.len <- sort(list.files(path.len, pattern = "_R2_001.fastq.gz", full.names = TRUE))
 
 
 #Vis read quality of its-extracted reads
