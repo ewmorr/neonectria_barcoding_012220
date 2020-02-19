@@ -14,8 +14,8 @@ seqDir = "R1_R2_switched/itsxpress"
 list.files(seqDir)
 
 #parse and sort file names, adjust regex as needed
-itsFs <- sort(list.files(seqDir, pattern = "_R1*.fastq.gz", full.names = TRUE))
-itsRs <- sort(list.files(seqDir, pattern = "_R2*.fastq.gz", full.names = TRUE))
+itsFs <- sort(list.files(seqDir, pattern = "_R1_001.fastq.gz", full.names = TRUE))
+itsRs <- sort(list.files(seqDir, pattern = "_R2_001.fastq.gz", full.names = TRUE))
 
 #itsxpress outputs 0 len reads. filter for len
 #make files
@@ -26,7 +26,7 @@ itsRs.len <- file.path(path.len, basename(itsRs))
 
 #filter
 out2 <- filterAndTrim(itsFs, itsFs.len, itsRs, itsRs.len, maxN = 0, maxEE = c(2, 2),
-truncQ = 2, minLen = 10, rm.phix = TRUE, compress = TRUE, multithread = 8)  # on windows, set multithread = FALSE
+truncQ = 2, minLen = 10, rm.phix = TRUE, compress = TRUE, multithread = 24)  # on windows, set multithread = FALSE
 head(out2)
 saveRDS(out2, "intermediate_RDS/read_filtering_read_counts_2.rds")
 
@@ -46,8 +46,8 @@ dev.off()
 #At this point the tutorial at https://benjjneb.github.io/dada2/tutorial.html is likely more informative than the ITS specific tutorial
 
 #Learn the error rates
-errF <- learnErrors(itsFs.len, multithread = 8)
-errR <- learnErrors(itsRs.len, multithread = 8)
+errF <- learnErrors(itsFs.len, multithread = 24)
+errR <- learnErrors(itsRs.len, multithread = 24)
 
 #Viz
 pdf("dada2_processing_tables_figs/error_rate_graphs.pdf")
@@ -69,8 +69,8 @@ names(derepRs) <- sample.names
 
 #DADA2 alogorithm
 #pooling samples is not default, but increases sensitivity to low abundance sequences shared across samples
-dadaFs <- dada(derepFs, err = errF, multithread = 8, pool = T)
-dadaRs <- dada(derepRs, err = errR, multithread = 8, pool = T)
+dadaFs <- dada(derepFs, err = errF, multithread = 24, pool = T)
+dadaRs <- dada(derepRs, err = errR, multithread = 24, pool = T)
 
 #merge pairs
 mergers <- mergePairs(dadaFs, derepFs, dadaRs, derepRs, verbose=TRUE, maxMismatch = 0)
