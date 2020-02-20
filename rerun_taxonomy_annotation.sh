@@ -15,6 +15,6 @@ module load anaconda/colsa
 conda activate dada2-check
 
 # first run dada2 for the concatenated files
-cd ~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/sep_run_pool #this was originally run with last year's UNITE db
+cd ~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/sep_run_pool #this was originally run with last year's UNITE db
 
 srun Rscript ~/repo/neonectria_barcoding_012220/UNITE_taxonomic_classification-slurm.r
