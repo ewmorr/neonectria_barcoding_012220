@@ -10,6 +10,7 @@ taxa.w_bootstraps = readRDS("intermediate_RDS/taxa_w_bootstraps.rds")
 #taxa.print <- taxa.w_bootstraps$tax  # Removing sequence rownames for display only
 #rownames(taxa.print) <- NULL
 
+system("mkdir dada2_out")
 ################################
 #Create workable objects (on hd)
 
@@ -69,17 +70,17 @@ rownames(out2) = unname(sapply(rownames(out2), get.sample.name))
 #Track reads through the pipeline
 
 track = full_join(data.frame(out2, sample = rownames(out2)), readRDS("intermediate_RDS/denoisedF.getN.df.rds"), by = "sample") %>%
-full_join(., data.frame(readRDS("intermediate_RDS/denoisedR.getN.df.rds"), by = "sample") %>%
-full_join(., readRDS("intermediate_RDS/mergers.getN.df.rds"), by = "sample") %>%
+full_join(., data.frame(readRDS("intermediate_RDS/denoisedR.getN.df.rds")), by = "sample") %>%
+full_join(., data.frame(readRDS("intermediate_RDS/mergers.getN.df.rds")), by = "sample") %>%
 full_join(., data.frame(nonchim = rowSums(seqtab.nochim), sample = rownames(data.frame(rowSums(seqtab.nochim)))), by = "sample") %>%
 replace(., is.na(.), 0)
 
 #alternate join for processing full tables without using sample names (ordered)
-#track = cbind(data.frame(out2, sample = rownames(out2)), readRDS("intermediate_RDS/denoisedF.getN.df.rds")[,1]) %>%
-#    cbind(.,readRDS("intermediate_RDS/denoisedR.getN.df.rds")[,1]) %>%
-#    cbind(.,readRDS("intermediate_RDS/mergers.getN.df.rds")[,1]) %>%
-#    cbind(.,data.frame(nonchim = rowSums(seqtab.nochim)))
-#colnames(track) = c ("itsxextracted", "gt_10_len", "sample", "denoisedF", "denoisedR", "merged", "nonchim")
+track = cbind(data.frame(out2, sample = rownames(out2)), readRDS("intermediate_RDS/denoisedF.getN.df.rds")[,1]) %>%
+    cbind(.,readRDS("intermediate_RDS/denoisedR.getN.df.rds")[,1]) %>%
+    cbind(.,readRDS("intermediate_RDS/mergers.getN.df.rds")[,1]) %>%
+    cbind(.,data.frame(nonchim = rowSums(seqtab.nochim)))
+colnames(track) = c ("itsxextracted", "gt_10_len", "sample", "denoisedF", "denoisedR", "merged", "nonchim")
 
 
 

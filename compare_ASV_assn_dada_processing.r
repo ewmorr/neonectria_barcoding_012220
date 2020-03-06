@@ -53,11 +53,90 @@ seq_tab.nochim.files_sep = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_0
 taxa.w_bootstraps.files_sep = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_sep/intermediate_RDS/taxa_w_bootstraps.rds")
 
 
-#Venn Diagram
+#seq_tab.nochim.files_cat[rowSums(seq_tab.nochim.files_cat) > 1000,] %>% rownames
+
+###############
+#Venn Diagram#
 require(VennDiagram)
 venn.diagram(list(sep_run_pool = colnames(t(seqtab.nochim.pool_sep)), global_pool = colnames(seq_tab.nochim.files_sep), cat_seq_files = colnames(seq_tab.nochim.files_cat)), filename = "compare_dada_processing_figs/shared_ASVs_Venn.tiff")
 
-#ASV richness by method
+
+
+#Code for ASV frequency plots -- this is done on tables that have been summed at the level of sample pairs so that comparisons are 1:1
+
+seqtab.nochim.pool_sep.sample_sum = readRDS("run1_run2_dada_compare/sep_run_pool/intermediate_RDS/dada2_seq_table_no_chim_run1run2_pool_sep_samples_summed.rds") %>% t
+
+seqtab.nochim.files_sep.sample_sum = readRDS("run1_run2_dada_compare/files_sep/intermediate_RDS/dada2_seq_table_no_chim_global_pool_samples_summed.rds") %>% t
+
+#filter samples based on shared across methods
+
+seqtab.nochim.pool_sep.sample_sum = seqtab.nochim.pool_sep.sample_sum[rownames(seqtab.nochim.pool_sep.sample_sum) %in% rownames(seq_tab.nochim.files_cat),]
+seqtab.nochim.files_sep.sample_sum = seqtab.nochim.files_sep.sample_sum[rownames(seqtab.nochim.files_sep.sample_sum) %in% rownames(seq_tab.nochim.files_cat),]
+
+#filter out zero count ASVS
+seqtab.nochim.pool_sep.sample_sum = seqtab.nochim.pool_sep.sample_sum[,colSums(seqtab.nochim.pool_sep.sample_sum) > 0]
+seqtab.nochim.files_sep.sample_sum = seqtab.nochim.files_sep.sample_sum[,colSums(seqtab.nochim.files_sep.sample_sum) > 0]
+
+#files_cat already loaded
+
+pool_sep.ASV_freq = colSums(seqtab.nochim.pool_sep.sample_sum > 0) %>% unname
+files_sep.ASV_freq = colSums(seqtab.nochim.files_sep.sample_sum > 0) %>% unname
+files_cat.ASV_freq = colSums(seq_tab.nochim.files_cat > 0) %>% unname
+
+sum(pool_sep.ASV_freq == 1)
+sum(files_sep.ASV_freq == 1)
+sum(files_cat.ASV_freq == 1)
+
+dada_processing.asv_freq = rbind(
+data.frame(processing = "sep run pool", sample_count = pool_sep.ASV_freq),
+data.frame(processing = "global pool", sample_count = files_sep.ASV_freq),
+data.frame(processing = "cat seq files", sample_count = files_cat.ASV_freq)
+)
+
+
+p = ggplot(dada_processing.asv_freq, aes(sample_count)) +
+geom_histogram(stat = "bin", binwidth = 1) +
+facet_wrap(~processing) +
+scale_y_sqrt(breaks = c(10,100,200,300,400,500)) +
+scale_x_continuous(breaks = c(1,50,100,150)) +
+labs(x = "ASV frequency (no. samples observed)", y = "ASV count") +
+my_gg_theme
+
+pdf("compare_dada_processing_figs/ASV_sample_freq.pdf", width = 12, height = 4)
+p
+dev.off()
+
+
+#Rank abundance (Even though this is done below for tables that have not been summed by sample pairs)
+pool_sep.rank_abd = colSums(seqtab.nochim.pool_sep.sample_sum) %>% unname %>% sort(decreasing = T)
+files_sep.rank_abd = colSums(seqtab.nochim.files_sep.sample_sum) %>% unname %>% sort(decreasing = T)
+files_cat.rank_abd = colSums(seq_tab.nochim.files_cat) %>% unname %>% sort(decreasing = T)
+
+dada_processing.rank_abd = rbind(
+data.frame(processing = "sep run pool", count = pool_sep.rank_abd, rank = seq(1,length(pool_sep.rank_abd), by = 1)),
+data.frame(processing = "global pool", count = files_sep.rank_abd, rank = seq(1,length(files_sep.rank_abd), by = 1)),
+data.frame(processing = "cat seq files", count = files_cat.rank_abd, rank = seq(1,length(files_cat.rank_abd), by = 1))
+)
+
+p = ggplot(dada_processing.rank_abd, aes(rank, count +1)) +
+geom_col(width = 1) +
+facet_wrap(~processing) +
+my_gg_theme +
+labs(y = "sequence count + 1") +
+scale_y_log10(labels = fancy_scientific)
+
+pdf("compare_dada_processing_figs/ASV_rank_abundance_sample_pairs_summed.pdf", width = 12, height = 4)
+p
+dev.off()
+
+#############
+#Venn diagram exclude singletons
+venn.diagram(list(sep_run_pool = colnames(seqtab.nochim.pool_sep.sample_sum)[colSums(seqtab.nochim.files_sep.sample_sum > 0) > 1], global_pool = colnames(seqtab.nochim.files_sep.sample_sum)[colSums(seqtab.nochim.files_sep.sample_sum > 0) > 1], cat_seq_files = colnames(seq_tab.nochim.files_cat)[colSums(seq_tab.nochim.files_cat > 0) > 1]), filename = "compare_dada_processing_figs/shared_ASVs_Venn_no_singletons.tiff")
+
+
+########################
+#ASV richness by method#
+
 #taking numbers from Venn
 asv_richness_method = data.frame(
     method = c(rep("sep run\npool", 4), rep("global\npool", 4), rep("cat seq\nfiles", 4)),
@@ -101,7 +180,9 @@ pdf("compare_dada_processing_figs/asv_richness_shared_col.pdf", width = 12, heig
 grid.arrange(p1,p2, ncol = 2, widths = c(.4,.6))
 dev.off()
 
-#rank abundance curves with indicator of method
+################################################
+#rank abundance curves with indicator of method#
+################################################
 
 pool_sep.rank_abd = data.frame(
 #    method = "sep run pool" ,
@@ -200,52 +281,3 @@ dev.off()
 
 
 
-
-#shared
-seqtab.nochim.join_by_ASVseq.sharedASVs = inner_join(
-data.frame(asv.seq = rownames(t(seqtab.nochim.r1)), t(seqtab.nochim.r1)),
-data.frame(asv.seq = rownames(t(seqtab.nochim.r2)), t(seqtab.nochim.r2)),
-by = "asv.seq"
-)
-rownames(seqtab.nochim.join_by_ASVseq.sharedASVs) = seqtab.nochim.join_by_ASVseq.sharedASVs$asv.seq
-seqtab.nochim.join_by_ASVseq.sharedASVs$asv.seq = NULL
-
-#run1 uniques
-seqtab.nochim.join_by_ASVseq.run1uniqASVs = anti_join(
-data.frame(asv.seq = rownames(t(seqtab.nochim.r1)), t(seqtab.nochim.r1)),
-data.frame(asv.seq = rownames(t(seqtab.nochim.r2)), t(seqtab.nochim.r2)),
-by = "asv.seq"
-)
-rownames(seqtab.nochim.join_by_ASVseq.run1uniqASVs) = seqtab.nochim.join_by_ASVseq.run1uniqASVs$asv.seq
-seqtab.nochim.join_by_ASVseq.run1uniqASVs$asv.seq = NULL
-
-#run2 uniques
-seqtab.nochim.join_by_ASVseq.run2uniqASVs = anti_join(
-data.frame(asv.seq = rownames(t(seqtab.nochim.r2)), t(seqtab.nochim.r2)),
-data.frame(asv.seq = rownames(t(seqtab.nochim.r1)), t(seqtab.nochim.r1)),
-by = "asv.seq"
-)
-rownames(seqtab.nochim.join_by_ASVseq.run2uniqASVs) = seqtab.nochim.join_by_ASVseq.run2uniqASVs$asv.seq
-seqtab.nochim.join_by_ASVseq.run2uniqASVs$asv.seq = NULL
-
-
-#counts
-total_ASVs = seqtab.nochim.join_by_ASVseq[rowSums(seqtab.nochim.join_by_ASVseq) > 0,]  %>% rownames %>% length
-shared_ASVs = seqtab.nochim.join_by_ASVseq.sharedASVs[rowSums(seqtab.nochim.join_by_ASVseq.sharedASVs) > 0,]  %>% rownames %>% length
-
-run1_ASVs = t(seqtab.nochim.r1)[rowSums(t(seqtab.nochim.r1)) > 0,] %>% rownames %>% length
-run2_ASVs = t(seqtab.nochim.r2)[rowSums(t(seqtab.nochim.r2)) > 0,] %>% rownames %>% length
-
-run1_uniq = seqtab.nochim.join_by_ASVseq.run1uniqASVs[rowSums(seqtab.nochim.join_by_ASVseq.run1uniqASVs) > 0,]  %>% rownames %>% length
-run2_uniq = seqtab.nochim.join_by_ASVseq.run2uniqASVs[rowSums(seqtab.nochim.join_by_ASVseq.run2uniqASVs) > 0,]  %>% rownames %>% length
-
-
-#alternate way to get names
-rownames(seqtab.nochim.join_by_ASVseq[
-    rowSums(seqtab.nochim.join_by_ASVseq[ ,1:length(rownames(seqtab.nochim.r1))
-    ]) > 0
-,])
-rownames( seqtab.nochim.join_by_ASVseq[
-    rowSums(seqtab.nochim.join_by_ASVseq[ ,length(rownames(seqtab.nochim.r1)) + 1:length(rownames(seqtab.nochim.r2))
-    ]) > 0
-,])
