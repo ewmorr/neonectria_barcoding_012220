@@ -60,7 +60,7 @@ dev.off()
 derepFs <- derepFastq(itsFs.len, verbose = TRUE)
 derepRs <- derepFastq(itsRs.len, verbose = TRUE)
 
-get.sample.name <- function(fname) strsplit(basename(fname), "_")[[1]][1]
+get.sample.name <- function(fname) strsplit(basename(fname), "_L00")[[1]][1]
 sample.names <- unname(sapply(itsFs.len, get.sample.name))
 
 names(derepFs) <- sample.names

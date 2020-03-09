@@ -14,8 +14,8 @@ seqDir = "R1_R2_switched/itsxpress"
 list.files(seqDir)
 
 #parse and sort file names, adjust regex as needed
-itsFs <- sort(list.files(seqDir, pattern = "_R1*.fastq.gz", full.names = TRUE))
-itsRs <- sort(list.files(seqDir, pattern = "_R2*.fastq.gz", full.names = TRUE))
+itsFs <- sort(list.files(seqDir, pattern = "_R1.fastq.gz", full.names = TRUE))
+itsRs <- sort(list.files(seqDir, pattern = "_R2.fastq.gz", full.names = TRUE))
 
 #itsxpress outputs 0 len reads. filter for len
 #make files
@@ -31,8 +31,8 @@ head(out2)
 saveRDS(out2, "intermediate_RDS/read_filtering_read_counts_2.rds")
 
 # sort filtered read files
-itsFs.len <- sort(list.files(path.len, pattern = "_R1*.fastq.gz", full.names = TRUE))
-itsRs.len <- sort(list.files(path.len, pattern = "_R2*.fastq.gz", full.names = TRUE))
+itsFs.len <- sort(list.files(path.len, pattern = "_R1.fastq.gz", full.names = TRUE))
+itsRs.len <- sort(list.files(path.len, pattern = "_R2.fastq.gz", full.names = TRUE))
 
 
 #Vis read quality of its-extracted reads

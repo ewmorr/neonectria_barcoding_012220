@@ -31,5 +31,21 @@ mkdir intermediate_RDS
 srun Rscript ~/repo/neonectria_barcoding_012220/dada2-slurm_files_sep.r
 srun Rscript ~/repo/neonectria_barcoding_012220/UNITE_taxonomic_classification-slurm.r
 
+#Then running run1 and run2 separately
+
+cd ~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_files_sep
+mkdir dada2_processing_tables_figs
+mkdir intermediate_RDS
+
+srun Rscript ~/repo/neonectria_barcoding_012220/dada2-slurm_files_sep.r
+srun Rscript ~/repo/neonectria_barcoding_012220/UNITE_taxonomic_classification-slurm.r
+
+cd ~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run2_files_sep
+mkdir dada2_processing_tables_figs
+mkdir intermediate_RDS
+
+srun Rscript ~/repo/neonectria_barcoding_012220/dada2-slurm_files_sep.r
+srun Rscript ~/repo/neonectria_barcoding_012220/UNITE_taxonomic_classification-slurm.r
+
 conda deactivate
 
