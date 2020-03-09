@@ -16,24 +16,27 @@ do
     run2=$( echo "$line" | cut -f 3 )
     newLab=$( echo "$line" | cut -f 1 )
 
-    run1R1=R1_R2_switched/itsxpress/gt_10/${run1}_[^P]*_R1*.fastq.gz #Use negative match to 'P' to filter out sample repeats across plates; run 1 only
-    run1R2=R1_R2_switched/itsxpress/gt_10/${run1}_[^P]*_R2*.fastq.gz
-    run2R1=R1_R2_switched/itsxpress/gt_10/${run2}_*_R1*.fastq.gz
-    run2R2=R1_R2_switched/itsxpress/gt_10/${run2}_*_R2*.fastq.gz
+    run1R1=run1_run2_itsxpress_files_sep/${run1}_*_R1*.fastq.gz #Use negative match to 'P' to filter out sample repeats across plates; run 1 only
+    run1R2=run1_run2_itsxpress_files_sep/${run1}_*_R2*.fastq.gz
+    run2R1=run1_run2_itsxpress_files_sep/${run2}_*_R1*.fastq.gz
+    run2R2=run1_run2_itsxpress_files_sep/${run2}_*_R2*.fastq.gz
 
-    echo "trying $run1R1"
+    #echo "trying $run1R1"
 
     if [ -f $run1R1 ] && [ -f $run2R1 ]
     then
-        echo "success"
+        #echo "success"
+        #echo ""
         cat $run1R1 $run2R1 > run1_run2_files_cat/${newLab}_R1.fastq.gz
         cat $run1R2 $run2R2 > run1_run2_files_cat/${newLab}_R2.fastq.gz
     elif [ -f $run1R1 ] && [ ! -f $run2R1 ]
     then
+        echo "$run1R1"
         cat $run1R1 > run1_run2_files_cat/${newLab}_R1.fastq.gz
         cat $run1R2 > run1_run2_files_cat/${newLab}_R2.fastq.gz
     elif [ ! -f $run1R1 ] && [ -f $run2R1 ]
     then
+        echo "$run2R1"
         cat $run2R1 > run1_run2_files_cat/${newLab}_R1.fastq.gz
         cat $run2R2 > run1_run2_files_cat/${newLab}_R2.fastq.gz
     fi

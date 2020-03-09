@@ -46,19 +46,28 @@ rownames(seqtab.nochim.pool_sep) = seqtab.nochim.pool_sep$asv.seq
 seqtab.nochim.pool_sep$asv.seq = NULL
 seqtab.nochim.pool_sep[is.na(seqtab.nochim.pool_sep)] = 0
 
-seq_tab.nochim.files_cat = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_cat/intermediate_RDS/dada2_seq_table_no_chim.rds")
+taxa.w_bootstraps.pool_sep = rbind(
+    data.frame(asv.seq = rownames(taxa.w_bootstraps.pool_sep.r1$tax), taxa.w_bootstraps.pool_sep.r1$tax),
+    data.frame(asv.seq = rownames(taxa.w_bootstraps.pool_sep.r2$tax), taxa.w_bootstraps.pool_sep.r2$tax)
+) %>% unique
+
+seqtab.nochim.files_cat = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_cat/intermediate_RDS/dada2_seq_table_no_chim.rds")
 taxa.w_bootstraps.files_cat = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_cat/intermediate_RDS/taxa_w_bootstraps.rds")
 
-seq_tab.nochim.files_sep = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_sep/intermediate_RDS/dada2_seq_table_no_chim.rds")
+seqtab.nochim.files_sep = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_sep/intermediate_RDS/dada2_seq_table_no_chim.rds")
 taxa.w_bootstraps.files_sep = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_sep/intermediate_RDS/taxa_w_bootstraps.rds")
 
+#Convert to character to replace cylindrocarpon annotations
+taxa.w_bootstraps.pool_sep = taxa.w_bootstraps.pool_sep %>% mutate_all(as.character)
+taxa.w_bootstraps.files_sep = data.frame(asv.seq = rownames(taxa.w_bootstraps.files_sep$tax), taxa.w_bootstraps.files_sep$tax) %>% mutate_all(as.character)
+taxa.w_bootstraps.files_cat = data.frame(asv.seq = rownames(taxa.w_bootstraps.files_cat$tax), taxa.w_bootstraps.files_cat$tax) %>% mutate_all(as.character)
 
-#seq_tab.nochim.files_cat[rowSums(seq_tab.nochim.files_cat) > 1000,] %>% rownames
+#seqtab.nochim.files_cat[rowSums(seqtab.nochim.files_cat) > 1000,] %>% rownames
 
 ###############
 #Venn Diagram#
 require(VennDiagram)
-venn.diagram(list(sep_run_pool = colnames(t(seqtab.nochim.pool_sep)), global_pool = colnames(seq_tab.nochim.files_sep), cat_seq_files = colnames(seq_tab.nochim.files_cat)), filename = "compare_dada_processing_figs/shared_ASVs_Venn.tiff")
+venn.diagram(list(sep_run_pool = colnames(t(seqtab.nochim.pool_sep)), global_pool = colnames(seqtab.nochim.files_sep), cat_seq_files = colnames(seqtab.nochim.files_cat)), filename = "compare_dada_processing_figs/shared_ASVs_Venn.tiff")
 
 
 
@@ -70,8 +79,8 @@ seqtab.nochim.files_sep.sample_sum = readRDS("run1_run2_dada_compare/files_sep/i
 
 #filter samples based on shared across methods
 
-seqtab.nochim.pool_sep.sample_sum = seqtab.nochim.pool_sep.sample_sum[rownames(seqtab.nochim.pool_sep.sample_sum) %in% rownames(seq_tab.nochim.files_cat),]
-seqtab.nochim.files_sep.sample_sum = seqtab.nochim.files_sep.sample_sum[rownames(seqtab.nochim.files_sep.sample_sum) %in% rownames(seq_tab.nochim.files_cat),]
+seqtab.nochim.pool_sep.sample_sum = seqtab.nochim.pool_sep.sample_sum[rownames(seqtab.nochim.pool_sep.sample_sum) %in% rownames(seqtab.nochim.files_cat),]
+seqtab.nochim.files_sep.sample_sum = seqtab.nochim.files_sep.sample_sum[rownames(seqtab.nochim.files_sep.sample_sum) %in% rownames(seqtab.nochim.files_cat),]
 
 #filter out zero count ASVS
 seqtab.nochim.pool_sep.sample_sum = seqtab.nochim.pool_sep.sample_sum[,colSums(seqtab.nochim.pool_sep.sample_sum) > 0]
@@ -81,7 +90,7 @@ seqtab.nochim.files_sep.sample_sum = seqtab.nochim.files_sep.sample_sum[,colSums
 
 pool_sep.ASV_freq = colSums(seqtab.nochim.pool_sep.sample_sum > 0) %>% unname
 files_sep.ASV_freq = colSums(seqtab.nochim.files_sep.sample_sum > 0) %>% unname
-files_cat.ASV_freq = colSums(seq_tab.nochim.files_cat > 0) %>% unname
+files_cat.ASV_freq = colSums(seqtab.nochim.files_cat > 0) %>% unname
 
 sum(pool_sep.ASV_freq == 1)
 sum(files_sep.ASV_freq == 1)
@@ -110,7 +119,7 @@ dev.off()
 #Rank abundance (Even though this is done below for tables that have not been summed by sample pairs)
 pool_sep.rank_abd = colSums(seqtab.nochim.pool_sep.sample_sum) %>% unname %>% sort(decreasing = T)
 files_sep.rank_abd = colSums(seqtab.nochim.files_sep.sample_sum) %>% unname %>% sort(decreasing = T)
-files_cat.rank_abd = colSums(seq_tab.nochim.files_cat) %>% unname %>% sort(decreasing = T)
+files_cat.rank_abd = colSums(seqtab.nochim.files_cat) %>% unname %>% sort(decreasing = T)
 
 dada_processing.rank_abd = rbind(
 data.frame(processing = "sep run pool", count = pool_sep.rank_abd, rank = seq(1,length(pool_sep.rank_abd), by = 1)),
@@ -131,7 +140,7 @@ dev.off()
 
 #############
 #Venn diagram exclude singletons
-venn.diagram(list(sep_run_pool = colnames(seqtab.nochim.pool_sep.sample_sum)[colSums(seqtab.nochim.files_sep.sample_sum > 0) > 1], global_pool = colnames(seqtab.nochim.files_sep.sample_sum)[colSums(seqtab.nochim.files_sep.sample_sum > 0) > 1], cat_seq_files = colnames(seq_tab.nochim.files_cat)[colSums(seq_tab.nochim.files_cat > 0) > 1]), filename = "compare_dada_processing_figs/shared_ASVs_Venn_no_singletons.tiff")
+venn.diagram(list(sep_run_pool = colnames(seqtab.nochim.pool_sep.sample_sum)[colSums(seqtab.nochim.files_sep.sample_sum > 0) > 1], global_pool = colnames(seqtab.nochim.files_sep.sample_sum)[colSums(seqtab.nochim.files_sep.sample_sum > 0) > 1], cat_seq_files = colnames(seqtab.nochim.files_cat)[colSums(seqtab.nochim.files_cat > 0) > 1]), filename = "compare_dada_processing_figs/shared_ASVs_Venn_no_singletons.tiff")
 
 
 ########################
@@ -193,15 +202,15 @@ pool_sep.rank_abd = data.frame(
 
 global_pool.rank_abd = data.frame(
 #    method = "global pool",
-    asv.seq = colnames(seq_tab.nochim.files_sep),
-    count.global_pool = colSums(seq_tab.nochim.files_sep),
+    asv.seq = colnames(seqtab.nochim.files_sep),
+    count.global_pool = colSums(seqtab.nochim.files_sep),
     global_pool = 1
 )
 
 cat_seq_files.rank_abd = data.frame(
 #    method = "cat seq files",
-    asv.seq = colnames(seq_tab.nochim.files_cat),
-    count.cat_seq_files = colSums(seq_tab.nochim.files_cat),
+    asv.seq = colnames(seqtab.nochim.files_cat),
+    count.cat_seq_files = colSums(seqtab.nochim.files_cat),
     cat_seq_files = 1
 )
 
@@ -270,14 +279,212 @@ labs(y = "ASV sequence count") +
 my_gg_theme +
 theme(legend.title = element_text(size = 20))
 
-
 pdf("compare_dada_processing_figs/rank_abundance.pdf", width = 16, height = 6)
 p1
 dev.off()
 
 
+####################################
+#Compare Nf/Nd assignment by sample#
+
+#Neonectria ASVs
+
+for(i in 1:length(rownames(taxa.w_bootstraps.pool_sep))){
+    if(is.na(taxa.w_bootstraps.pool_sep[i,7]) == T | is.na(taxa.w_bootstraps.pool_sep[i,8]) == T){
+        next
+    }else
+    if(taxa.w_bootstraps.pool_sep[i,7] == "g__Cylindrocarpon" & taxa.w_bootstraps.pool_sep[i,8] == "s__faginatum"){
+        print("T")
+        taxa.w_bootstraps.pool_sep[i,7] = "g__Neonectria"
+        taxa.w_bootstraps.pool_sep[i,8] = "s__faginata"
+    }
+}
+
+for(i in 1:length(rownames(taxa.w_bootstraps.files_sep))){
+    if(is.na(taxa.w_bootstraps.files_sep[i,7]) == T | is.na(taxa.w_bootstraps.files_sep[i,8]) == T){
+        next
+    }else
+    if(taxa.w_bootstraps.files_sep[i,7] == "g__Cylindrocarpon" & taxa.w_bootstraps.files_sep[i,8] == "s__faginatum"){
+        print("T")
+        taxa.w_bootstraps.files_sep[i,7] = "g__Neonectria"
+        taxa.w_bootstraps.files_sep[i,8] = "s__faginata"
+    }
+}
+
+for(i in 1:length(rownames(taxa.w_bootstraps.files_cat))){
+    if(is.na(taxa.w_bootstraps.files_cat[i,7]) == T | is.na(taxa.w_bootstraps.files_cat[i,8]) == T){
+        next
+    }else
+    if(taxa.w_bootstraps.files_cat[i,7] == "g__Cylindrocarpon" & taxa.w_bootstraps.files_cat[i,8] == "s__faginatum"){
+        print("T")
+        taxa.w_bootstraps.files_cat[i,7] = "g__Neonectria"
+        taxa.w_bootstraps.files_cat[i,8] = "s__faginata"
+    }
+}
+
+taxa.w_bootstraps.pool_sep = taxa.w_bootstraps.pool_sep %>% mutate_all(as.character)
+taxa.w_bootstraps.files_sep = data.frame(asv.seq = rownames(taxa.w_bootstraps.files_sep$tax), taxa.w_bootstraps.files_sep$tax) %>% mutate_all(as.character)
+taxa.w_bootstraps.files_cat = data.frame(asv.seq = rownames(taxa.w_bootstraps.files_cat$tax), taxa.w_bootstraps.files_cat$tax) %>% mutate_all(as.character)
+
+taxa.w_bootstraps.pool_sep.Nf = filter(taxa.w_bootstraps.pool_sep, Genus == "g__Neonectria" & Species == "s__faginata")
+taxa.w_bootstraps.files_sep.Nf = filter(taxa.w_bootstraps.files_sep, Genus == "g__Neonectria" & Species == "s__faginata")
+taxa.w_bootstraps.files_cat.Nf = filter(taxa.w_bootstraps.files_cat, Genus == "g__Neonectria" & Species == "s__faginata")
+
+taxa.w_bootstraps.pool_sep.Nd = filter(taxa.w_bootstraps.pool_sep, Genus == "g__Neonectria" & Species == "s__ditissima")
+taxa.w_bootstraps.files_sep.Nd = filter(taxa.w_bootstraps.files_sep, Genus == "g__Neonectria" & Species == "s__ditissima")
+taxa.w_bootstraps.files_cat.Nd = filter(taxa.w_bootstraps.files_cat, Genus == "g__Neonectria" & Species == "s__ditissima")
+
+seqtab.nochim.pool_sep.sample_sum.Nf = data.frame(asv.seq = rownames(t(seqtab.nochim.pool_sep.sample_sum)), t(seqtab.nochim.pool_sep.sample_sum)) %>%
+    filter(asv.seq %in% taxa.w_bootstraps.pool_sep.Nf$asv.seq)
+seqtab.nochim.pool_sep.sample_sum.Nd = data.frame(asv.seq = rownames(t(seqtab.nochim.pool_sep.sample_sum)), t(seqtab.nochim.pool_sep.sample_sum)) %>%
+    filter(asv.seq %in% taxa.w_bootstraps.pool_sep.Nd$asv.seq)
+seqtab.nochim.pool_sep.sample_sum.Nf$asv.seq = NULL
+seqtab.nochim.pool_sep.sample_sum.Nd$asv.seq = NULL
+
+seqtab.nochim.files_sep.sample_sum.Nf = data.frame(asv.seq = rownames(t(seqtab.nochim.files_sep.sample_sum)), t(seqtab.nochim.files_sep.sample_sum)) %>%
+filter(asv.seq %in% taxa.w_bootstraps.files_sep.Nf$asv.seq)
+seqtab.nochim.files_sep.sample_sum.Nd = data.frame(asv.seq = rownames(t(seqtab.nochim.files_sep.sample_sum)), t(seqtab.nochim.files_sep.sample_sum)) %>%
+filter(asv.seq %in% taxa.w_bootstraps.files_sep.Nd$asv.seq)
+seqtab.nochim.files_sep.sample_sum.Nf$asv.seq = NULL
+seqtab.nochim.files_sep.sample_sum.Nd$asv.seq = NULL
+
+seqtab.nochim.files_cat.Nf = data.frame(asv.seq = rownames(t(seqtab.nochim.files_cat)), t(seqtab.nochim.files_cat)) %>%
+filter(asv.seq %in% taxa.w_bootstraps.files_cat.Nf$asv.seq)
+seqtab.nochim.files_cat.Nd = data.frame(asv.seq = rownames(t(seqtab.nochim.files_cat)), t(seqtab.nochim.files_cat)) %>%
+filter(asv.seq %in% taxa.w_bootstraps.files_cat.Nd$asv.seq)
+seqtab.nochim.files_cat.Nf$asv.seq = NULL
+seqtab.nochim.files_cat.Nd$asv.seq = NULL
 
 
+Nf_Nd_sample_counts_by_method = data.frame(processing = rep(c("sep run pool", "global pool", "files cat"),2), N_type = c(rep("Nf", 3), rep("Nd", 3)),
+    count = c(
+        (colSums(seqtab.nochim.pool_sep.sample_sum.Nf) > 0) %>% sum,
+        (colSums(seqtab.nochim.files_sep.sample_sum.Nf) > 0) %>% sum,
+        (colSums(seqtab.nochim.files_cat.Nf) > 0) %>% sum,
+        (colSums(seqtab.nochim.pool_sep.sample_sum.Nd) > 0) %>% sum,
+        (colSums(seqtab.nochim.files_sep.sample_sum.Nd) > 0) %>% sum,
+        (colSums(seqtab.nochim.files_cat.Nd) > 0) %>% sum
+    )
+)
+Nf_Nd_sample_counts_by_method$processing = factor(Nf_Nd_sample_counts_by_method$processing, levels = c("sep run pool", "global pool", "files cat"))
 
+pdf("compare_dada_processing_figs/Nf_Nd_detection.pdf")
+ggplot(Nf_Nd_sample_counts_by_method, aes(processing, count, label = count)) +
+geom_col() +
+geom_text(aes(y = count+3)) +
+facet_wrap(~N_type) +
+labs(y = "samples detected", x = "") +
+my_gg_theme +
+theme(
+axis.text.x = element_text(angle = 35, hjust = 1))
+dev.off()
+
+##########################
+#Sample richness compare##
+richness_by_processing_method = rbind(
+data.frame(processing  = "sep_pool_run", richness = colSums(t(seqtab.nochim.pool_sep.sample_sum) > 0), sample = colnames(t(seqtab.nochim.pool_sep.sample_sum))),
+data.frame(processing  = "global_pool", richness = colSums(t(seqtab.nochim.files_sep.sample_sum) > 0), sample = colnames(t(seqtab.nochim.files_sep.sample_sum))),
+data.frame(processing  = "files_cat", richness = colSums(t(seqtab.nochim.files_cat) > 0), sample = colnames(t(seqtab.nochim.files_cat)))
+)
+
+richness_by_processing_method.wide = pivot_wider(richness_by_processing_method, id_cols = "sample", names_from = "processing", values_from = richness, names_prefix = "richness_")
+
+p1 = ggplot(richness_by_processing_method.wide, aes(richness_global_pool, richness_sep_pool_run)) +
+geom_point(alpha = 0.5) +
+geom_abline(slope = 1, intercept = 0) +
+geom_smooth(method = "lm") +
+scale_x_continuous(limits = c(0,200)) +
+scale_y_continuous(limits = c(0,200)) +
+labs(x = "global pool richness", y = "sep run pool richness") +
+my_gg_theme
+
+p2 = ggplot(richness_by_processing_method.wide, aes(richness_files_cat, richness_sep_pool_run)) +
+geom_point(alpha = 0.5) +
+geom_abline(slope = 1, intercept = 0) +
+geom_smooth(method = "lm") +
+scale_x_continuous(limits = c(0,200)) +
+scale_y_continuous(limits = c(0,200)) +
+labs(x = "files cat richness", y = "sep run pool richness") +
+my_gg_theme
+
+p3 = ggplot(richness_by_processing_method.wide, aes(richness_files_cat, richness_global_pool)) +
+geom_point(alpha = 0.5) +
+geom_abline(slope = 1, intercept = 0) +
+geom_smooth(method = "lm") +
+scale_x_continuous(limits = c(0,200)) +
+scale_y_continuous(limits = c(0,200)) +
+labs(x = "global pool richness", y = "global pool richness") +
+my_gg_theme
+
+require(gridExtra)
+
+pdf("compare_dada_processing_figs/richness_by_sample.pdf",width = 16, height = 5)
+grid.arrange(p1,p2,p3,ncol = 3)
+dev.off()
+
+
+##########################
+#Sample sequence count compare##
+sequence_count_by_processing_method = rbind(
+data.frame(processing  = "sep_pool_run", sequence_count = colSums(t(seqtab.nochim.pool_sep.sample_sum)), metadata.label = colnames(t(seqtab.nochim.pool_sep.sample_sum))),
+data.frame(processing  = "global_pool", sequence_count = colSums(t(seqtab.nochim.files_sep.sample_sum)), metadata.label = colnames(t(seqtab.nochim.files_sep.sample_sum))),
+data.frame(processing  = "files_cat", sequence_count = colSums(t(seqtab.nochim.files_cat)), metadata.label = colnames(t(seqtab.nochim.files_cat)))
+)
+
+sequence_count_by_processing_method.wide = pivot_wider(sequence_count_by_processing_method, id_cols = "metadata.label", names_from = "processing", values_from = sequence_count, names_prefix = "sequence_count_")
+sequence_count_by_processing_method.wide.meta = left_join(sequence_count_by_processing_method.wide, metadata_ordered, by = "metadata.label")
+
+p1 = ggplot(sequence_count_by_processing_method.wide.meta %>% filter(bench.control == "n" & seq.rep == "n"), aes(sequence_count_global_pool+1, sequence_count_sep_pool_run+1)) +
+geom_point(alpha = 0.5) +
+geom_abline(slope = 1, intercept = 0) +
+geom_smooth(method = "lm") +
+scale_y_log10() +
+scale_x_log10() +
+#scale_x_continuous(limits = c(0,200)) +
+#scale_y_continuous(limits = c(0,200)) +
+labs(x = "global pool sequence count", y = "sep run pool sequence count") +
+my_gg_theme
+
+p2 = ggplot(sequence_count_by_processing_method.wide.meta %>% filter(bench.control == "n" & seq.rep == "n"), aes(sequence_count_files_cat+1, sequence_count_sep_pool_run+1)) +
+geom_point(alpha = 0.5) +
+geom_abline(slope = 1, intercept = 0) +
+geom_smooth(method = "lm") +
+scale_y_log10() +
+scale_x_log10() +
+#scale_x_continuous(limits = c(0,200)) +
+#scale_y_continuous(limits = c(0,200)) +
+labs(x = "files cat sequence count", y = "sep run pool sequence count") +
+my_gg_theme
+
+p3 = ggplot(sequence_count_by_processing_method.wide.meta %>% filter(bench.control == "n" & seq.rep == "n"), aes(sequence_count_files_cat+1, sequence_count_global_pool+1)) +
+geom_point(alpha = 0.5) +
+geom_abline(slope = 1, intercept = 0) +
+geom_smooth(method = "lm") +
+scale_y_log10() +
+scale_x_log10() +
+#scale_x_continuous(limits = c(0,200)) +
+#scale_y_continuous(limits = c(0,200)) +
+labs(x = "global pool sequence count", y = "global pool sequence count") +
+my_gg_theme
+
+pdf("compare_dada_processing_figs/sequence_count_by_sample.pdf",width = 16, height = 5)
+grid.arrange(p1,p2,p3,ncol = 3)
+dev.off()
+
+sequence_count_by_processing_method.wide.meta %>% filter(sequence_count_sep_pool_run > sequence_count_files_cat & bench.control == "n") %>% unique
+
+sequence_count_by_processing_method.wide%>% filter(sequence_count_sep_pool_run > sequence_count_files_cat*2)
+
+
+ggplot(sequence_count_by_processing_method.wide %>% filter(!metadata.label %in% c("BP227", "BP228", "BP229", "BP198", "BP199", "BP204", "BP192")), aes(sequence_count_global_pool+1, sequence_count_sep_pool_run+1)) +
+geom_point(alpha = 0.5) +
+geom_abline(slope = 1, intercept = 0) +
+geom_smooth(method = "lm") +
+scale_y_log10() +
+scale_x_log10() +
+#scale_x_continuous(limits = c(0,200)) +
+#scale_y_continuous(limits = c(0,200)) +
+labs(x = "global pool sequence count", y = "sep run pool sequence count") +
+my_gg_theme
 
 
