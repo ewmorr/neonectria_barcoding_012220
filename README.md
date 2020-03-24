@@ -80,3 +80,36 @@ Rscript ~/repo/neonectria_barcoding_012220/dada2_tables_to_file.r
 
 The output includes asv table by counts in samples, asv taxonomy, asv rep seqs, asv seq lens by frequency table, sequences retained at various processing steps, as well as visualizations
 
+### Combining run one `GARNAS_neonectria_barcoding_091819` and `GARNAS_neonectria_barcoding_012220`
+Combine from ITS extraction step to run dada2 denoising on full dataset
+
+```
+mkdir GARNAS_neonectria_barcoding_runOneAndTwo_020320
+mkdir GARNAS_neonectria_barcoding_runOneAndTwo_020320/R1_R2_switched/
+mkdir GARNAS_neonectria_barcoding_runOneAndTwo_020320/R1_R2_switched/itsxpress
+
+NEWDIR=GARNAS_neonectria_barcoding_runOneAndTwo_020320/R1_R2_switched/itsxpress
+for i in GARNAS_neonectria_barcoding_091819/R1_R2_switched/itsxpress/*fastq.gz
+do(
+    FILE=${i##*/}
+    cp $i ./$NEWDIR/runOne${FILE}
+)
+done
+
+for i in GARNAS_neonectria_barcoding_012220/R1_R2_switched/itsxpress/*fastq.gz
+do(
+FILE=${i##*/}
+cp $i ./$NEWDIR/runTwo${FILE}
+)
+done
+```
+
+Run dada2
+```
+cd GARNAS_neonectria_barcoding_runOneAndTwo_020320
+Rscript ~/repo/neonectria_barcoding_012220/dada2.r
+Rscript ~/repo/neonectria_barcoding_012220/UNITE_taxonomic_classification.r
+mkdir dada2_out
+#Rscript ~/repo/neonectria_barcoding_012220/dada2_tables_to_file.r
+
+```

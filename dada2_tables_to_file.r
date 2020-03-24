@@ -7,10 +7,10 @@ packageVersion("Biostrings")
 
 seqtab.nochim = readRDS("intermediate_RDS/dada2_seq_table_no_chim.rds")
 taxa.w_bootstraps = readRDS("intermediate_RDS/taxa_w_bootstraps.rds")
-
 #taxa.print <- taxa.w_bootstraps$tax  # Removing sequence rownames for display only
 #rownames(taxa.print) <- NULL
 
+system("mkdir dada2_out")
 ################################
 #Create workable objects (on hd)
 
@@ -46,7 +46,8 @@ require(tidyr)
 require(dplyr)
 require(ggplot2)
 require(RColorBrewer)
-source("../ggplot_theme.txt")
+
+source("~/ggplot_theme.txt")
 
 ##########################
 #read processing tracking#
@@ -54,29 +55,38 @@ source("../ggplot_theme.txt")
 get.sample.name <- function(fname) strsplit(basename(fname), "_L00")[[1]][1]
 
 #modified from the original dada2 tracking table so can handle different numbers of rows (samples that are dropped)
-out.filtN = readRDS("intermediate_RDS/read_filtering_read_counts.filtN.rds")
-out = readRDS("intermediate_RDS/read_filtering_read_counts.rds")
+#out.filtN = readRDS("intermediate_RDS/read_filtering_read_counts.filtN.rds")
+#out = readRDS("intermediate_RDS/read_filtering_read_counts.rds")
 out2 = readRDS("intermediate_RDS/read_filtering_read_counts_2.rds")
-colnames(out.filtN) = c("input", "N_filtered")
-colnames(out) = c ("cutadapt", "quality_filtered")
+#colnames(out.filtN) = c("input", "N_filtered")
+#colnames(out) = c ("cutadapt", "quality_filtered")
 colnames(out2) = c ("itsxextracted", "gt_10_len")
 
-rownames(out.filtN) = unname(sapply(rownames(out.filtN), get.sample.name))
-rownames(out) = unname(sapply(rownames(out), get.sample.name))
+
+### The commented rows are not run because the run and dada2 pipeline comparisons were performed after the quality filtering and read extraction steps which are performed on a per read basis
+#rownames(out.filtN) = unname(sapply(rownames(out.filtN), get.sample.name))
+#rownames(out) = unname(sapply(rownames(out), get.sample.name))
 rownames(out2) = unname(sapply(rownames(out2), get.sample.name))
 
 #Track reads through the pipeline
 
-track = full_join(data.frame(out.filtN, sample = rownames(out.filtN)), data.frame(out, sample = rownames(out))) %>%
-full_join(., data.frame(out2, sample = rownames(out2)), by = "sample") %>%
-full_join(., readRDS("intermediate_RDS/denoisedF.getN.df.rds"), by = "sample") %>%
-full_join(., readRDS("intermediate_RDS/denoisedR.getN.df.rds"), by = "sample") %>%
-full_join(., readRDS("intermediate_RDS/mergers.getN.df.rds"), by = "sample") %>%
+track = full_join(data.frame(out2, sample = rownames(out2)), readRDS("intermediate_RDS/denoisedF.getN.df.rds"), by = "sample") %>%
+full_join(., data.frame(readRDS("intermediate_RDS/denoisedR.getN.df.rds")), by = "sample") %>%
+full_join(., data.frame(readRDS("intermediate_RDS/mergers.getN.df.rds")), by = "sample") %>%
 full_join(., data.frame(nonchim = rowSums(seqtab.nochim), sample = rownames(data.frame(rowSums(seqtab.nochim)))), by = "sample") %>%
 replace(., is.na(.), 0)
 
-track.long = track %>% arrange(desc(input)) %>% gather(., "step", "count", -sample)
-track.long$step = factor(track.long$step, levels = c("input", "N_filtered", "cutadapt", "quality_filtered", "itsxextracted", "gt_10_len", "denoisedF", "denoisedR", "merged",
+#alternate join for processing full tables without using sample names (ordered)
+track = cbind(data.frame(out2, sample = rownames(out2)), readRDS("intermediate_RDS/denoisedF.getN.df.rds")[,1]) %>%
+    cbind(.,readRDS("intermediate_RDS/denoisedR.getN.df.rds")[,1]) %>%
+    cbind(.,readRDS("intermediate_RDS/mergers.getN.df.rds")[,1]) %>%
+    cbind(.,data.frame(nonchim = rowSums(seqtab.nochim)))
+colnames(track) = c ("itsxextracted", "gt_10_len", "sample", "denoisedF", "denoisedR", "merged", "nonchim")
+
+
+
+track.long = track %>% arrange(desc(itsxextracted)) %>% gather(., "step", "count", -sample)
+track.long$step = factor(track.long$step, levels = c("itsxextracted", "gt_10_len", "denoisedF", "denoisedR", "merged",
 "nonchim"))
 
 write.csv(track.long, "dada2_processing_tables_figs/read_processing_tracking.csv")
@@ -120,6 +130,21 @@ theme(axis.text.x = element_blank()) +
 labs(x = "sample")
 
 pdf("dada2_processing_tables_figs/read_counts_processing_steps_faceted.pdf", width = 10)
+print(p1)
+dev.off()
+
+palette_len = track.long %>% filter(step != "gt_10_len" & step != "denoisedR") %>% select(sample) %>% unique %>% rownames %>% length
+getPalette = colorRampPalette(brewer.pal(n = 12, name = "Paired"))
+
+p1 = ggplot(track.long %>% filter(step != "gt_10_len" & step != "denoisedR"), aes(x = step, y = count + 1, group = sample, color = sample)) +
+geom_line() +
+scale_y_log10() +
+my_gg_theme +
+scale_color_manual(values = getPalette(palette_len), guide = F) +
+labs(x = "") +
+theme(axis.text.x =element_text(angle = 35, hjust = 1))
+
+pdf("dada2_processing_tables_figs/read_counts_processing_steps_by_sample.pdf", width = 12, height = 6)
 print(p1)
 dev.off()
 

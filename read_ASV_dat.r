@@ -15,7 +15,7 @@ site_info = read.csv("sample_data/site_info.csv")
 #Some gymnastics to get sample labels in the correct format. Could fix this upstream...
 colnames(asv_tab) = unname(sapply(colnames(asv_tab), get.sample.name))
 track.long$sample <- unname(sapply(as.character(track.long$sample), get.sample.name))
-track.long$sample = paste0("X", track.long$sample)
+#track.long$sample = paste0("X", track.long$sample)
 
 #table joins
 metadata_ordered = full_join(metadata_map, id_bench_map)
