@@ -22,7 +22,7 @@ fancy_scientific <- function(l) {
 }
 
 setwd("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320")
-system("mkdir dada2_processing_compare")
+#system("mkdir dada2_processing_compare")
 
 sample_pairs = read.table("sample_data/run1_run2_sample_pairs.txt")
 colnames(sample_pairs) = c("metadata.label", "sample.runOne", "sample.runTwo")
@@ -30,11 +30,11 @@ colnames(sample_pairs) = c("metadata.label", "sample.runOne", "sample.runTwo")
 
 #########################
 #Separate pooling by run#
-seqtab.nochim.pool_sep.r1 = readRDS("~/GARNAS_neonectria_barcoding_091819/intermediate_RDS/dada2_seq_table_no_chim.rds")
-taxa.w_bootstraps.pool_sep.r1 = readRDS("~/GARNAS_neonectria_barcoding_091819/intermediate_RDS/taxa_w_bootstraps.rds")
+seqtab.nochim.pool_sep.r1 = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run1_files_sep/intermediate_RDS/dada2_seq_table_no_chim.rds")
+taxa.w_bootstraps.pool_sep.r1 = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run1_files_sep/intermediate_RDS/taxa_w_bootstraps.rds")
 
-seqtab.nochim.pool_sep.r2 = readRDS("~/GARNAS_neonectria_barcoding_012220/intermediate_RDS/dada2_seq_table_no_chim.rds")
-taxa.w_bootstraps.pool_sep.r2 = readRDS("~/GARNAS_neonectria_barcoding_012220/intermediate_RDS/taxa_w_bootstraps.rds")
+seqtab.nochim.pool_sep.r2 = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run2_files_sep/intermediate_RDS/dada2_seq_table_no_chim.rds")
+taxa.w_bootstraps.pool_sep.r2 = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run2_files_sep/intermediate_RDS/taxa_w_bootstraps.rds")
 
 #Join by ASV seq
 seqtab.nochim.pool_sep = full_join(
@@ -83,12 +83,16 @@ for(i in 1:length(sample_pairs$metadata.label)){
 seqtab.nochim.pool_sep.sample_sum[is.na(seqtab.nochim.pool_sep.sample_sum)] = 0
 seqtab.nochim.pool_sep.sample_sum = seqtab.nochim.pool_sep.sample_sum[,colSums(seqtab.nochim.pool_sep.sample_sum) > 0]
 
-saveRDS(seqtab.nochim.pool_sep.sample_sum, "run1_run2_dada_compare/sep_run_pool/intermediate_RDS/dada2_seq_table_no_chim_run1run2_pool_sep_samples_summed.rds")
+system("mkdir ~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/sep_run_pool")
+system("mkdir ~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/sep_run_pool/intermediate_RDS")
+
+saveRDS(seqtab.nochim.pool_sep.sample_sum, "~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/sep_run_pool/intermediate_RDS/dada2_seq_table_no_chim_run1run2_pool_sep_samples_summed.rds")
 
 ################
 #Global pooling#
-seqtab.nochim.files_sep = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_sep/intermediate_RDS/dada2_seq_table_no_chim.rds")
-taxa.w_bootstraps.files_sep = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_sep/intermediate_RDS/taxa_w_bootstraps.rds")
+
+seqtab.nochim.files_sep = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run1_run2_files_sep/intermediate_RDS/dada2_seq_table_no_chim.rds")
+taxa.w_bootstraps.files_sep = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run1_run2_files_sep/intermediate_RDS/taxa_w_bootstraps.rds")
 
 seqtab.nochim.files_sep.t = t(seqtab.nochim.files_sep)
 #Sum ASV counts by sample pairs
@@ -127,10 +131,10 @@ for(i in 1:length(sample_pairs$metadata.label)){
 seqtab.nochim.files_sep.sample_sum[is.na(seqtab.nochim.files_sep.sample_sum)] = 0
 seqtab.nochim.files_sep.sample_sum = seqtab.nochim.files_sep.sample_sum[,colSums(seqtab.nochim.files_sep.sample_sum) > 0]
 
-saveRDS(seqtab.nochim.files_sep.sample_sum, "run1_run2_dada_compare/files_sep/intermediate_RDS/dada2_seq_table_no_chim_global_pool_samples_summed.rds")
+saveRDS(seqtab.nochim.files_sep.sample_sum, "~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run1_run2_files_sep/intermediate_RDS/dada2_seq_table_no_chim_global_pool_samples_summed.rds")
 
 ####################
 #Files concatenated#
-seq_tab.nochim.files_cat = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_cat/intermediate_RDS/dada2_seq_table_no_chim.rds")
-taxa.w_bootstraps.files_cat = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_cat/intermediate_RDS/taxa_w_bootstraps.rds")
+#seq_tab.nochim.files_cat = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_cat/intermediate_RDS/dada2_seq_table_no_chim.rds")
+#taxa.w_bootstraps.files_cat = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_cat/intermediate_RDS/taxa_w_bootstraps.rds")
 

@@ -23,17 +23,17 @@ fancy_scientific <- function(l) {
 setwd("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320")
 system("mkdir dada2_processing_compare")
 
-seqtab.nochim.pool_sep.r1 = readRDS("~/GARNAS_neonectria_barcoding_091819/intermediate_RDS/dada2_seq_table_no_chim.rds")
-taxa.w_bootstraps.pool_sep.r1 = readRDS("~/GARNAS_neonectria_barcoding_091819/intermediate_RDS/taxa_w_bootstraps.rds")
+seqtab.nochim.pool_sep.r1 = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run1_files_sep/intermediate_RDS/dada2_seq_table_no_chim.rds")
+taxa.w_bootstraps.pool_sep.r1 = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run1_files_sep/intermediate_RDS/taxa_w_bootstraps.rds")
 
-seqtab.nochim.pool_sep.r2 = readRDS("~/GARNAS_neonectria_barcoding_012220/intermediate_RDS/dada2_seq_table_no_chim.rds")
-taxa.w_bootstraps.pool_sep.r2 = readRDS("~/GARNAS_neonectria_barcoding_012220/intermediate_RDS/taxa_w_bootstraps.rds")
+seqtab.nochim.pool_sep.r2 = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run2_files_sep/intermediate_RDS/dada2_seq_table_no_chim.rds")
+taxa.w_bootstraps.pool_sep.r2 = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run2_files_sep/intermediate_RDS/taxa_w_bootstraps.rds")
 
 #set sample names to match metadata
 rownames(seqtab.nochim.pool_sep.r1) = unname(sapply(rownames(seqtab.nochim.pool_sep.r1), get.sample.name))
-rownames(seqtab.nochim.pool_sep.r1) = paste0("runOne", rownames(seqtab.nochim.pool_sep.r1))
+#rownames(seqtab.nochim.pool_sep.r1) = paste0("runOne", rownames(seqtab.nochim.pool_sep.r1))
 rownames(seqtab.nochim.pool_sep.r2) = unname(sapply(rownames(seqtab.nochim.pool_sep.r2), get.sample.name))
-rownames(seqtab.nochim.pool_sep.r2) = paste0("runTwo", rownames(seqtab.nochim.pool_sep.r2))
+#rownames(seqtab.nochim.pool_sep.r2) = paste0("runTwo", rownames(seqtab.nochim.pool_sep.r2))
 
 #join tables
 #full
@@ -51,11 +51,13 @@ taxa.w_bootstraps.pool_sep = rbind(
     data.frame(asv.seq = rownames(taxa.w_bootstraps.pool_sep.r2$tax), taxa.w_bootstraps.pool_sep.r2$tax)
 ) %>% unique
 
-seqtab.nochim.files_cat = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_cat/intermediate_RDS/dada2_seq_table_no_chim.rds")
-taxa.w_bootstraps.files_cat = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_cat/intermediate_RDS/taxa_w_bootstraps.rds")
+seqtab.nochim.files_cat = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run1_run2_files_cat/intermediate_RDS/dada2_seq_table_no_chim.rds")
+taxa.w_bootstraps.files_cat = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run1_run2_files_cat/intermediate_RDS/taxa_w_bootstraps.rds")
 
-seqtab.nochim.files_sep = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_sep/intermediate_RDS/dada2_seq_table_no_chim.rds")
-taxa.w_bootstraps.files_sep = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/run1_run2_dada_compare/files_sep/intermediate_RDS/taxa_w_bootstraps.rds")
+seqtab.nochim.files_sep = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run1_run2_files_sep/intermediate_RDS/dada2_seq_table_no_chim.rds")
+taxa.w_bootstraps.files_sep = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run1_run2_files_sep/intermediate_RDS/taxa_w_bootstraps.rds")
+
+rownames(seqtab.nochim.files_sep) = unname(sapply(rownames(seqtab.nochim.files_sep), get.sample.name))
 
 #Convert to character to replace cylindrocarpon annotations
 taxa.w_bootstraps.pool_sep = taxa.w_bootstraps.pool_sep %>% mutate_all(as.character)
@@ -73,18 +75,18 @@ venn.diagram(list(sep_run_pool = colnames(t(seqtab.nochim.pool_sep)), global_poo
 
 #Code for ASV frequency plots -- this is done on tables that have been summed at the level of sample pairs so that comparisons are 1:1
 
-seqtab.nochim.pool_sep.sample_sum = readRDS("run1_run2_dada_compare/sep_run_pool/intermediate_RDS/dada2_seq_table_no_chim_run1run2_pool_sep_samples_summed.rds") %>% t
+seqtab.nochim.pool_sep.sample_sum = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/sep_run_pool/intermediate_RDS/dada2_seq_table_no_chim_run1run2_pool_sep_samples_summed.rds") %>% t
 
-seqtab.nochim.files_sep.sample_sum = readRDS("run1_run2_dada_compare/files_sep/intermediate_RDS/dada2_seq_table_no_chim_global_pool_samples_summed.rds") %>% t
+seqtab.nochim.files_sep.sample_sum = readRDS("~/GARNAS_neonectria_barcoding_runOneAndTwo_020320/processing_methods_compare/run1_run2_files_sep/intermediate_RDS/dada2_seq_table_no_chim_global_pool_samples_summed.rds") %>% t
 
 #filter samples based on shared across methods
-
-seqtab.nochim.pool_sep.sample_sum = seqtab.nochim.pool_sep.sample_sum[rownames(seqtab.nochim.pool_sep.sample_sum) %in% rownames(seqtab.nochim.files_cat),]
-seqtab.nochim.files_sep.sample_sum = seqtab.nochim.files_sep.sample_sum[rownames(seqtab.nochim.files_sep.sample_sum) %in% rownames(seqtab.nochim.files_cat),]
+#THIS SHOULD NOT BE NEEDED WITH REPROCESSING BUT CHECK
+#seqtab.nochim.pool_sep.sample_sum = seqtab.nochim.pool_sep.sample_sum[rownames(seqtab.nochim.pool_sep.sample_sum) %in% rownames(seqtab.nochim.files_cat),]
+#seqtab.nochim.files_sep.sample_sum = seqtab.nochim.files_sep.sample_sum[rownames(seqtab.nochim.files_sep.sample_sum) %in% rownames(seqtab.nochim.files_cat),]
 
 #filter out zero count ASVS
-seqtab.nochim.pool_sep.sample_sum = seqtab.nochim.pool_sep.sample_sum[,colSums(seqtab.nochim.pool_sep.sample_sum) > 0]
-seqtab.nochim.files_sep.sample_sum = seqtab.nochim.files_sep.sample_sum[,colSums(seqtab.nochim.files_sep.sample_sum) > 0]
+#seqtab.nochim.pool_sep.sample_sum = seqtab.nochim.pool_sep.sample_sum[,colSums(seqtab.nochim.pool_sep.sample_sum) > 0]
+#seqtab.nochim.files_sep.sample_sum = seqtab.nochim.files_sep.sample_sum[,colSums(seqtab.nochim.files_sep.sample_sum) > 0]
 
 #files_cat already loaded
 
@@ -115,6 +117,14 @@ pdf("compare_dada_processing_figs/ASV_sample_freq.pdf", width = 12, height = 4)
 p
 dev.off()
 
+ggplot(dada_processing.asv_freq, aes(sample_count)) +
+geom_histogram(stat = "bin", binwidth = 1) +
+facet_wrap(~processing) +
+#scale_y_sqrt(breaks = c(10,100,200,300,400,500)) +
+scale_x_continuous(breaks = c(1,50,100,150)) +
+labs(x = "ASV frequency (no. samples observed)", y = "ASV count") +
+my_gg_theme
+
 
 #Rank abundance (Even though this is done below for tables that have not been summed by sample pairs)
 pool_sep.rank_abd = colSums(seqtab.nochim.pool_sep.sample_sum) %>% unname %>% sort(decreasing = T)
@@ -141,6 +151,8 @@ dev.off()
 #############
 #Venn diagram exclude singletons
 venn.diagram(list(sep_run_pool = colnames(seqtab.nochim.pool_sep.sample_sum)[colSums(seqtab.nochim.files_sep.sample_sum > 0) > 1], global_pool = colnames(seqtab.nochim.files_sep.sample_sum)[colSums(seqtab.nochim.files_sep.sample_sum > 0) > 1], cat_seq_files = colnames(seqtab.nochim.files_cat)[colSums(seqtab.nochim.files_cat > 0) > 1]), filename = "compare_dada_processing_figs/shared_ASVs_Venn_no_singletons.tiff")
+#only singletons
+venn.diagram(list(sep_run_pool = colnames(seqtab.nochim.pool_sep.sample_sum)[colSums(seqtab.nochim.files_sep.sample_sum > 0) == 1], global_pool = colnames(seqtab.nochim.files_sep.sample_sum)[colSums(seqtab.nochim.files_sep.sample_sum > 0) == 1], cat_seq_files = colnames(seqtab.nochim.files_cat)[colSums(seqtab.nochim.files_cat > 0) == 1]), filename = "compare_dada_processing_figs/shared_ASVs_Venn_only_singletons.tiff")
 
 
 ########################
@@ -289,6 +301,10 @@ dev.off()
 
 #Neonectria ASVs
 
+taxa.w_bootstraps.pool_sep = taxa.w_bootstraps.pool_sep %>% mutate_all(as.character)
+taxa.w_bootstraps.files_sep = data.frame(asv.seq = rownames(taxa.w_bootstraps.files_sep$tax), taxa.w_bootstraps.files_sep$tax) %>% mutate_all(as.character)
+taxa.w_bootstraps.files_cat = data.frame(asv.seq = rownames(taxa.w_bootstraps.files_cat$tax), taxa.w_bootstraps.files_cat$tax) %>% mutate_all(as.character)
+
 for(i in 1:length(rownames(taxa.w_bootstraps.pool_sep))){
     if(is.na(taxa.w_bootstraps.pool_sep[i,7]) == T | is.na(taxa.w_bootstraps.pool_sep[i,8]) == T){
         next
@@ -321,10 +337,6 @@ for(i in 1:length(rownames(taxa.w_bootstraps.files_cat))){
         taxa.w_bootstraps.files_cat[i,8] = "s__faginata"
     }
 }
-
-taxa.w_bootstraps.pool_sep = taxa.w_bootstraps.pool_sep %>% mutate_all(as.character)
-taxa.w_bootstraps.files_sep = data.frame(asv.seq = rownames(taxa.w_bootstraps.files_sep$tax), taxa.w_bootstraps.files_sep$tax) %>% mutate_all(as.character)
-taxa.w_bootstraps.files_cat = data.frame(asv.seq = rownames(taxa.w_bootstraps.files_cat$tax), taxa.w_bootstraps.files_cat$tax) %>% mutate_all(as.character)
 
 taxa.w_bootstraps.pool_sep.Nf = filter(taxa.w_bootstraps.pool_sep, Genus == "g__Neonectria" & Species == "s__faginata")
 taxa.w_bootstraps.files_sep.Nf = filter(taxa.w_bootstraps.files_sep, Genus == "g__Neonectria" & Species == "s__faginata")
@@ -413,10 +425,9 @@ geom_abline(slope = 1, intercept = 0) +
 geom_smooth(method = "lm") +
 scale_x_continuous(limits = c(0,200)) +
 scale_y_continuous(limits = c(0,200)) +
-labs(x = "global pool richness", y = "global pool richness") +
+labs(x = "files cat richness", y = "global pool richness") +
 my_gg_theme
 
-require(gridExtra)
 
 pdf("compare_dada_processing_figs/richness_by_sample.pdf",width = 16, height = 5)
 grid.arrange(p1,p2,p3,ncol = 3)
@@ -432,9 +443,8 @@ data.frame(processing  = "files_cat", sequence_count = colSums(t(seqtab.nochim.f
 )
 
 sequence_count_by_processing_method.wide = pivot_wider(sequence_count_by_processing_method, id_cols = "metadata.label", names_from = "processing", values_from = sequence_count, names_prefix = "sequence_count_")
-sequence_count_by_processing_method.wide.meta = left_join(sequence_count_by_processing_method.wide, metadata_ordered, by = "metadata.label")
 
-p1 = ggplot(sequence_count_by_processing_method.wide.meta %>% filter(bench.control == "n" & seq.rep == "n"), aes(sequence_count_global_pool+1, sequence_count_sep_pool_run+1)) +
+p1 = ggplot(sequence_count_by_processing_method.wide , aes(sequence_count_global_pool+1, sequence_count_sep_pool_run+1)) +
 geom_point(alpha = 0.5) +
 geom_abline(slope = 1, intercept = 0) +
 geom_smooth(method = "lm") +
@@ -445,7 +455,7 @@ scale_x_log10() +
 labs(x = "global pool sequence count", y = "sep run pool sequence count") +
 my_gg_theme
 
-p2 = ggplot(sequence_count_by_processing_method.wide.meta %>% filter(bench.control == "n" & seq.rep == "n"), aes(sequence_count_files_cat+1, sequence_count_sep_pool_run+1)) +
+p2 = ggplot(sequence_count_by_processing_method.wide, aes(sequence_count_files_cat+1, sequence_count_sep_pool_run+1)) +
 geom_point(alpha = 0.5) +
 geom_abline(slope = 1, intercept = 0) +
 geom_smooth(method = "lm") +
@@ -456,7 +466,7 @@ scale_x_log10() +
 labs(x = "files cat sequence count", y = "sep run pool sequence count") +
 my_gg_theme
 
-p3 = ggplot(sequence_count_by_processing_method.wide.meta %>% filter(bench.control == "n" & seq.rep == "n"), aes(sequence_count_files_cat+1, sequence_count_global_pool+1)) +
+p3 = ggplot(sequence_count_by_processing_method.wide, aes(sequence_count_files_cat+1, sequence_count_global_pool+1)) +
 geom_point(alpha = 0.5) +
 geom_abline(slope = 1, intercept = 0) +
 geom_smooth(method = "lm") +
@@ -470,21 +480,5 @@ my_gg_theme
 pdf("compare_dada_processing_figs/sequence_count_by_sample.pdf",width = 16, height = 5)
 grid.arrange(p1,p2,p3,ncol = 3)
 dev.off()
-
-sequence_count_by_processing_method.wide.meta %>% filter(sequence_count_sep_pool_run > sequence_count_files_cat & bench.control == "n") %>% unique
-
-sequence_count_by_processing_method.wide%>% filter(sequence_count_sep_pool_run > sequence_count_files_cat*2)
-
-
-ggplot(sequence_count_by_processing_method.wide %>% filter(!metadata.label %in% c("BP227", "BP228", "BP229", "BP198", "BP199", "BP204", "BP192")), aes(sequence_count_global_pool+1, sequence_count_sep_pool_run+1)) +
-geom_point(alpha = 0.5) +
-geom_abline(slope = 1, intercept = 0) +
-geom_smooth(method = "lm") +
-scale_y_log10() +
-scale_x_log10() +
-#scale_x_continuous(limits = c(0,200)) +
-#scale_y_continuous(limits = c(0,200)) +
-labs(x = "global pool sequence count", y = "sep run pool sequence count") +
-my_gg_theme
 
 
