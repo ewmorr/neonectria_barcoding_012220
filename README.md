@@ -113,3 +113,7 @@ mkdir dada2_out
 #Rscript ~/repo/neonectria_barcoding_012220/dada2_tables_to_file.r
 
 ```
+
+Ran comparison of dada2 ASV assignmnet in terms of combining samples across separate runs, and pooling parameters. These included concatenating sequence files from the same sample but different runs before ASV assigment, including all of the samples from the two separarte runs in a single `pool = T` call, and running the samples from two different runs through dada2 (with `pool = T`) separately. In the two latter approaches the sequences within an ASV were added from the same samples across the two runs. ASV richness, ASV overlap (between methods), and occurence of two Neonectria species was then compared. Concatenating the sample sequence files appear to be the most appropriate approach because 1) it creates the fewest number of ASVs that are unique to only that method, 2) it creates the fewest number of ASVs that occur in only a single sample, 3) it creates the fewest number of low abundance ASVs (i.e., it shortens rank abundance curve), and 4) it does not drop sequences compared to the other two methods. That is, the above suggests that we are culling sequence errors that would otherwise result in spurious richness.
+
+
