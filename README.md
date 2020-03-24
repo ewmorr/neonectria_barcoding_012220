@@ -20,7 +20,7 @@ mkdir intermediate_RDS
 ```
 Run the pre-processing script.
 ```
-Rscript ~/repo/neonectria_barcoding_012220/rm_primers_and_qual_filter.r
+Rscript ~/repo/neonectria_barcoding_012220/sequence_processing_and_dada2/rm_primers_and_qual_filter.r
 ```
 Or open an R terminal and run the commands in `rm_primers_and_qual_filter.r` (This stuff should mostly run fine on a reasonably good laptop)
 
@@ -66,16 +66,16 @@ The stdout is sent to file bc I have the program set to output the trimmed read 
 
 Run dada2 algorith in R or run the script interactively
 ```
-Rscript ~/repo/neonectria_barcoding_012220/dada2.r
+Rscript ~/repo/neonectria_barcoding_012220/sequence_processing_and_dada2/dada2.r
 ```
 run taxonomy assignment
 ```
-Rscript ~/repo/neonectria_barcoding_012220/UNITE_taxonomic_classification.r
+Rscript ~/repo/neonectria_barcoding_012220/sequence_processing_and_dada2/UNITE_taxonomic_classification.r
 ```
 write tables to file and make plots
 ```
 mkdir dada2_out
-Rscript ~/repo/neonectria_barcoding_012220/dada2_tables_to_file.r
+Rscript ~/repo/neonectria_barcoding_012220/sequence_processing_and_dada2/dada2_tables_to_file.r
 ```
 
 The output includes asv table by counts in samples, asv taxonomy, asv rep seqs, asv seq lens by frequency table, sequences retained at various processing steps, as well as visualizations
@@ -107,10 +107,10 @@ done
 Run dada2
 ```
 cd GARNAS_neonectria_barcoding_runOneAndTwo_020320
-Rscript ~/repo/neonectria_barcoding_012220/dada2.r
-Rscript ~/repo/neonectria_barcoding_012220/UNITE_taxonomic_classification.r
+Rscript ~/repo/neonectria_barcoding_012220/sequence_processing_and_dada2/dada2.r
+Rscript ~/repo/neonectria_barcoding_012220/sequence_processing_and_dada2/UNITE_taxonomic_classification.r
 mkdir dada2_out
-#Rscript ~/repo/neonectria_barcoding_012220/dada2_tables_to_file.r
+#Rscript ~/repo/neonectria_barcoding_012220/sequence_processing_and_dada2/dada2_tables_to_file.r
 
 ```
 
