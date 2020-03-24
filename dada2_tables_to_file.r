@@ -46,6 +46,7 @@ require(tidyr)
 require(dplyr)
 require(ggplot2)
 require(RColorBrewer)
+
 source("~/ggplot_theme.txt")
 
 ##########################
@@ -102,6 +103,21 @@ theme(axis.text.x = element_blank()) +
 labs(x = "sample")
 
 pdf("dada2_processing_tables_figs/read_counts_processing_steps_stacked.pdf", width = 20, height = 6)
+print(p1)
+dev.off()
+
+palette_len = track.long %>% filter(step != "gt_10_len" & step != "denoisedR") %>% select(sample) %>% unique %>% rownames %>% length
+getPalette = colorRampPalette(brewer.pal(n = 12, name = "Paired"))
+
+p1 = ggplot(track.long %>% filter(step != "gt_10_len" & step != "denoisedR"), aes(x = step, y = count + 1, group = sample, color = sample)) +
+geom_line() +
+scale_y_log10() +
+my_gg_theme +
+scale_color_manual(values = getPalette(palette_len), guide = F) +
+labs(x = "") +
+theme(axis.text.x =element_text(angle = 35, hjust = 1))
+
+pdf("dada2_processing_tables_figs/read_counts_processing_steps_by_sample.pdf", width = 12, height = 6)
 print(p1)
 dev.off()
 

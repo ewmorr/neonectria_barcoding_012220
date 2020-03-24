@@ -6,7 +6,7 @@ cd ~/GARNAS_neonectria_barcoding_012220
 
 mkdir original_reads
 
-for i in cobb.sr.unh.edu/managed/*/reads/Sample*/*fastq.gz;do( mv $i ./original_reads/;)done
+for i in cobb.sr.unh.edu/managed/*P3/reads/Sample*/*fastq.gz;do( mv $i ./original_reads/;)done
 
 mkdir R1_R2_switched
 
