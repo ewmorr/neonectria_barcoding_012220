@@ -3,7 +3,7 @@ require(reshape2)
 require(dplyr)
 require(raster)
 
-install_github(repo = "ropensci/prism")
+#install_github(repo = "ropensci/prism")
 require(prism)
 
 prism_set_dl_dir("/Users/ericmorrison/PRISM_data")
@@ -16,7 +16,7 @@ get_prism_normals(type = 'tmin', resolution = '4km', annual = T, keepZip = TRUE)
 
 #Convert raster to point data
 
-new_file<-3#this number corresponds to the row of the file of interest
+new_file<-2#this number corresponds to the row of the file of interest
 RS <- prism_stack(ls_prism_data()[new_file,1]) ##raster file of data
 proj4string(RS)<-CRS("+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs") ##assign projection info
 
@@ -48,11 +48,11 @@ my_gg_theme +
 theme(
 legend.title = element_text(size = 20)
 ) +
-scale_fill_gradient2("MAT", low='darkslateblue',mid='lightblue',high = 'red',midpoint=10)
+scale_fill_gradient2("Tmax", low='darkslateblue',mid='lightblue',high = 'red',midpoint=10)
 
 plot_height = (maxLat-minLat)/2
 plot_width = (maxLon-minLon)/2
 
-pdf("PRISM_maps/site_MAT_map.pdf", height = plot_height, width = plot_width)
+pdf("PRISM_maps/site_tmax_map.pdf", height = plot_height, width = plot_width)
 print(p1)
 dev.off()

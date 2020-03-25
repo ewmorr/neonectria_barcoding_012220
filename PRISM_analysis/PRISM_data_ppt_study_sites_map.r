@@ -57,11 +57,11 @@ my_gg_theme +
 theme(
 legend.title = element_text(size = 20)
 ) +
-scale_fill_gradient2("precip.\n(mm)", high='darkslateblue',mid='lightblue',low = 'red',midpoint = 1500)
+scale_fill_gradient2("precip.\n(mm)", high='#01665e',mid='#c7eae5',low = '#8c510a',midpoint = 1250)
 
 plot_height = (maxLat-minLat)/2
 plot_width = (maxLon-minLon)/2
 
-pdf("site_ppt_map.pdf", height = plot_height, width = plot_width)
-p1
+pdf("PRISM_maps/site_ppt_map.pdf", height = plot_height, width = plot_width)
+print(p1)
 dev.off()

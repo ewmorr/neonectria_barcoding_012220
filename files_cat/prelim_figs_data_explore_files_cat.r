@@ -124,17 +124,6 @@ pdf("prelim_figs/NMDS_neo_occurence_by_lat_1Kmin.pdf", width = 8, height = 6)
 p
 dev.off()
 
-p = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, shape = occurence)) +
-geom_point(size = 5) +
-my_gg_theme +
-theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
-scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), labels = c("Nd" = "N. ditissima", "Nf" = "N. faginata", "none" = "none", "both" = "both"))
-
-pdf("prelim_figs/NMDS_neo_occurence_by_run_1Kmin.pdf", width = 8, height = 6)
-p
-dev.off()
-
-
 ##############################
 #Neonectria frequency by site#
 
