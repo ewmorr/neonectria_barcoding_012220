@@ -12,6 +12,7 @@ survey_dat = read.table("sample_data/trees_site_survey_data.txt", header = T, se
 neo_cov = read.table("sample_data/plug_neonectria_coverage.txt", header = T)
 site_info = read.csv("sample_data/site_info.csv")
 site_means = read.table("sample_data/BBD_survey_transect_data.site_mean.txt", header = T)
+site_climate = read.table("sample_data/sites_climate.txt", header = T)
 
 #Some gymnastics to get sample labels in the correct format. Could fix this upstream...
 colnames(asv_tab) = unname(sapply(colnames(asv_tab), get.sample.name))
@@ -20,7 +21,10 @@ track.long$sample <- unname(sapply(as.character(track.long$sample), get.sample.n
 
 #table joins
 metadata_ordered = full_join(metadata_map, id_bench_map)
-survey_dat.neo_cov = full_join(survey_dat, neo_cov, by = c("Site", "Tree", "Plug")) %>% left_join(., site_info, by = "Site") %>% left_join(., site_means, by = "Site")
+survey_dat.neo_cov = full_join(survey_dat, neo_cov, by = c("Site", "Tree", "Plug")) %>%
+    left_join(., site_info, by = "Site") %>%
+    left_join(., site_means, by = "Site") %>%
+    left_join(., site_climate, by = c("Site","lat","lon"))
 
 full_metadata = full_join(metadata_ordered, survey_dat.neo_cov, by = c("Site", "Tree", "Plug"))
 if("seq.rep" %in% colnames(full_metadata)){
