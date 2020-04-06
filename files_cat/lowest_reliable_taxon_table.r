@@ -38,7 +38,7 @@ ASV_count_by_taxon = data.frame(ASV = row.names(asv_tax), asv_tax) %>%
 write.table(ASV_count_by_taxon, file = "tables/ASV_count_by_taxon.txt", sep = "\t", row.names = F, quote = F)
 
 #####################################
-#Sum sample and siteoccurence for each taxon#
+#Sum sample and site occurence for each taxon#
 samples_to_sum = full_metadata %>% filter(bench.control == "n" & locus == "ITS2") %>% select(sample, Site)
 
 asv_tab.tax = inner_join(data.frame(ASV = row.names(asv_tax), asv_tax),
