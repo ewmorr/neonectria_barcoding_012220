@@ -61,6 +61,11 @@ asv_tab.negatives.long = melt(asv_tab.negatives.asvnames[rowSums(asv_tab.negativ
 id = "ASV", variable.name = "sample", value.name = "count") %>%
 data.frame
 
+#####################################
+#Remove control samples from asv_tab#
+
+asv_tab = asv_tab[,!colnames(asv_tab) %in% colnames(asv_tab.negatives)]
+
 #################################################
 #Process asv_tax for lowest informative taxonomy#
 
