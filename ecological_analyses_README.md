@@ -1,6 +1,7 @@
 
 
-Data is housed in `~/GARNAS_neonectria_barcoding_files_cat_03242020`
+Data is housed in `~/GARNAS_neonectria_barcoding_files_cat_03242020`.
+This is data that has been processed by first quality filtering and ITS extaction of individual .fastq files, then concatenating files from the same sample and running through dada2 algorithm (`sequence_processing_DADA2_README.md`). Finally, ASVs were filtered using LULU algorithm (`LULU_README.md`).
 ```
 cd ~/GARNAS_neonectria_barcoding_files_cat_03242020
 ```
