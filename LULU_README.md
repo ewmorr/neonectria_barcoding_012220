@@ -14,4 +14,18 @@ vsearch --usearch_global dada2_out/ASVs.fa --db dada2_out/ASVs.fa --self --id .8
 conda deactivate
 ```
 
+Run LULU algorithm at min_similarity 84, 90, 93, 95
+```
+Rscript ~/repo/neonectria_barcoding_012220/LULU/LULU.r
+```
+Count the number of ASVs with species and genus names reassigned. Specieas are counted as reassigned if the child is not NA (but is named) and is assigned to something other than the named species (including if it is then assigned to NA). Genus is counted the same, but is not counted if species level naming is already counted.
+```
+sims=( 84 90 93 95 )
+for i in ${sims[@]}
+do(
+echo $i
+perl ~/repo/neonectria_barcoding_012220/LULU/count_species_and_genera_reassigned.pl LULU/merged_asvs_${i}.txt LULU/which_reassigned_${i}.txt
+)
+done
+```
 
