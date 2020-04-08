@@ -1,4 +1,6 @@
 #!/usr/bin/perl
+#Eric Morrison
+#04082020
 
 use strict;
 use warnings;
@@ -30,7 +32,8 @@ sub num_reassigned{
     foreach my $child (sort{$a cmp $b} keys %taxa){
         if($taxa{$child}{"species"}[0] ne "NA" & $taxa{$child}{"species"}[0] ne $taxa{$child}{"species"}[1]){
             $sppReassigned++;
-        }elsif($taxa{$child}{"genus"}[0] ne "NA" & $taxa{$child}{"genus"}[0] ne $taxa{$child}{"genus"}[1]){
+        }
+        if($taxa{$child}{"genus"}[0] ne "NA" & $taxa{$child}{"genus"}[0] ne $taxa{$child}{"genus"}[1]){
             $genReassigned++;
         }
     }
@@ -42,7 +45,7 @@ sub which_reassigned{
     my $out = $_[1];
     open(OUT, ">$out") || die "Can't open output.\n";
     my %taxa = %$taxaRef;
-    print OUT "tax_level\tchild_id\tseq_sim\tn_samples_child\tchild_tax\tparent_tax\n";
+    print OUT "tax_level\tchild_id\tsparent_id\teq_sim\tn_samples_child\tchild_tax\tparent_tax\n";
     foreach my $child (sort{$a cmp $b} keys %taxa){
         if($taxa{$child}{"species"}[0] ne "NA" & $taxa{$child}{"species"}[0] ne $taxa{$child}{"species"}[1]){
                 print OUT "species", "\t", $taxa{$child}{"species"}[2], "\t", $taxa{$child}{"species"}[3], "\t", $taxa{$child}{"species"}[4], "\t", $taxa{$child}{"genus"}[0],";",$taxa{$child}{"species"}[0], "\t", $taxa{$child}{"genus"}[1],";",$taxa{$child}{"species"}[1], "\n";

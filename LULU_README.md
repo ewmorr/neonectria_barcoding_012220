@@ -18,7 +18,7 @@ Run LULU algorithm at min_similarity 84, 90, 93, 95
 ```
 Rscript ~/repo/neonectria_barcoding_012220/LULU/LULU.r
 ```
-Count the number of ASVs with species and genus names reassigned. Specieas are counted as reassigned if the child is not NA (but is named) and is assigned to something other than the named species (including if it is then assigned to NA). Genus is counted the same, but is not counted if species level naming is already counted.
+Count the number of ASVs with species and genus names reassigned. Specieas are counted as reassigned if the child is not NA (but is named) and is assigned to something other than the named species (including if it is then assigned to NA). Genus is counted the same, is also counted even if species level naming is already counted.
 ```
 sims=( 84 90 93 95 )
 for i in ${sims[@]}
