@@ -16,7 +16,6 @@ cat neo_map/Nf.fa neo_map/Nd.fa > neo_map/Nf_Nd.fa
 Merge quality filtered and ITS extracted sequences with vsearch and dereplicate. then map. Merging is performed with default minimum overlap and maxdifs.
 ```
 mkdir neo_map/merged_seqs
-mkdir neo_map/vsearch_aln
 
 #activate conda env with VSEARCH installed
 conda activate itsxpress_3p
@@ -25,6 +24,7 @@ for i in run1_run2_files_cat_seqs/*R1.fastq.gz
 do(
     sample_id=${i#*/}
     sample_id=${sample_id%_R1.fastq.gz}
+    
     vsearch --fastq_mergepairs run1_run2_files_cat_seqs/${sample_id}_R1.fastq.gz \
         --threads 4 \
         --reverse run1_run2_files_cat_seqs/${sample_id}_R2.fastq.gz \
@@ -36,15 +36,14 @@ Derpelicate sequences with "cluster" size output, and also label sequences with 
 ```
 for i in neo_map/merged_seqs/*.fasta
 do(
-sample_id=${i#*/}
-sample_id=${sample_id%.fasta}
+    sample_id=${i#*/}
+    sample_id=${sample_id%.fasta}
 
-vsearch --derep_fulllength neo_map/merged_seqs/${sample_id}.fasta \
-    --sizeout \
-    --output neo_map/merged_seqs/${sample_id}.derep.fasta
+    vsearch --derep_fulllength neo_map/merged_seqs/${sample_id}.fasta \
+        --sizeout \
+        --output neo_map/merged_seqs/${sample_id}.derep.fasta
 
-sed -i '' "s/^>.*/&;sample=${sample_id};/g" neo_map/merged_seqs/${sample_id}.derep.fasta
-
+    sed -i '' "s/^>.*/&;sample=${sample_id};/g" neo_map/merged_seqs/${sample_id}.derep.fasta
 )
 done
 ```
@@ -60,4 +59,8 @@ vsearch --usearch_global neo_map/all_seqs.derep.fa \
     --id 0.97 \
     --alnout neo_map/all_seqs.derep.aln.txt \
     --otutabout neo_map/all_seqs.derep.otu_tab.txt
+
+sed -i '' 's/#OTU ID/OTUID/' neo_map/all_seqs.derep.otu_tab.txt
+
+conda deactivate
 ```
