@@ -73,22 +73,28 @@ Nf_v_Nd.mapping.long = gather(Nf_v_Nd.mapping, "spp", "Neonectria_count.mapping"
 
 #join mapping and ASV counts
 Nf_Nd.asv_mapping_comp = full_join(Nf_v_Nd.long, Nf_v_Nd.mapping.long, by = c("sample", "spp"))
-#vserach does not write files with zero counts, so add zero for NAs
+#vsearch does not write files with zero counts, so add zero for NAs
 Nf_Nd.asv_mapping_comp[is.na(Nf_Nd.asv_mapping_comp)] = 0
+#add sample sequence totals from asv_tab
+Nf_Nd.asv_mapping_comp.w_counts = left_join(Nf_Nd.asv_mapping_comp,
+    data.frame(sample = colnames(asv_tab), total_seqs = colSums(asv_tab))
+)
 
-asv_not_count = filter(Nf_Nd.asv_mapping_comp, Neonectria_count.asv == 0 & Neonectria_count.mapping > 0) %>%
-    select(sample) %>% length
-count_not_asv = filter(Nf_Nd.asv_mapping_comp, Neonectria_count.asv > 0 & Neonectria_count.mapping == 0) %>%
-    select(sample) %>% length
+count_not_asv = filter(Nf_Nd.asv_mapping_comp.w_counts, Neonectria_count.asv == 0 & Neonectria_count.mapping > 0 & !is.na(total_seqs)) %>%
+    select(sample)
+asv_not_count = filter(Nf_Nd.asv_mapping_comp.w_counts, Neonectria_count.asv > 0 & Neonectria_count.mapping == 0 & !is.na(total_seqs)) %>%
+    select(sample)
 
-p = ggplot(Nf_Nd.asv_mapping_comp, aes(Neonectria_count.asv +1, Neonectria_count.mapping +1)) +
-geom_point(alpha = 0.5) +
+p = ggplot(Nf_Nd.asv_mapping_comp.w_counts, aes(Neonectria_count.asv +1, Neonectria_count.mapping +1, size = total_seqs)) +
+geom_point(alpha = 0.25) +
 scale_x_log10() +
 scale_y_log10() +
+scale_size_continuous(breaks = c(10^2,10^3,10^4,5*10^4,10^5,10^6), range = c(1,10))+#, trans = "log10") +
 my_gg_theme +
-labs(x = "ASV counts + 1", y = "Mapping counts + 1")
+labs(x = "ASV counts + 1", y = "Mapping counts + 1", size = "Total seqs.") +
+theme(legend.title = element_text(size = 18))
 
-pdf("neo_map/Neonectria_ASV_v_mapping_counts.pdf")
+pdf("neo_map/Neonectria_ASV_v_mapping_counts.pdf", width = 8, height = 6)
 print(p)
 dev.off()
 

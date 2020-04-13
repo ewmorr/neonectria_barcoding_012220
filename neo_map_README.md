@@ -64,3 +64,8 @@ sed -i '' 's/#OTU ID/OTUID/' neo_map/all_seqs.derep.otu_tab.txt
 
 conda deactivate
 ```
+Compare counts from DADA2 ASV vs mapping for Neonectria
+```
+Rscript ~/repo/neonectria_barcoding_012220/neo_map/compare_mapping_ASV.r
+```
+
