@@ -68,4 +68,4 @@ Compare counts from DADA2 ASV vs mapping for Neonectria
 ```
 Rscript ~/repo/neonectria_barcoding_012220/neo_map/compare_mapping_ASV.r
 ```
-
+There were four samples that mapping picked up Nf, but ASV did not, and one sample where ASV picked up NF but mapping did not
