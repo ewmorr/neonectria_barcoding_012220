@@ -28,5 +28,4 @@ Table of lowest informative taxon
 Rscript ~/repo/neonectria_barcoding_012220/ecol/lowest_reliable_taxon_table.r
 ```
 
-
 ##### extract nectriaceae and/or neonectria ASV seqs and perform phylogenetic analyses
