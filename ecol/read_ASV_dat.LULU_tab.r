@@ -61,17 +61,6 @@ asv_tab.negatives.long = melt(asv_tab.negatives.asvnames[rowSums(asv_tab.negativ
 id = "ASV", variable.name = "sample", value.name = "count") %>%
 data.frame
 
-##########################################################
-#Read in LULU filtered (93% minimum_simlarity) ASV table#
-#Also filter asv_tax based on retained ASVs###############
-
-asv_tab = read.table("LULU/asv_tab.LULU_93.txt", header = T)
-#remove negatives
-asv_tab = asv_tab[,!colnames(asv_tab) %in% colnames(asv_tab.negatives)]
-#remove zero sum asvs (though there actually are none)
-asv_tab = asv_tab[rowSums(asv_tab) > 1,]
-#Also filter asv_tax based on retained ASVs
-asv_tax = asv_tax[rownames(asv_tax) %in% rownames(asv_tab),]
 
 #################################################
 #Process asv_tax for lowest informative taxonomy#
@@ -103,6 +92,19 @@ asv_informative_taxa = apply(asv_tax.char, 1, function(x) get_informative_taxa(x
 #############################
 #Nf and Nd counts (sum ASVs)#
 
+#Also read mapping data in order to avg mapping counts and ASV counts for detection
+#read the mapping data
+asv_tab.mapping = read.table("neo_map/all_seqs.derep.otu_tab.txt", header = T)
+rownames(asv_tab.mapping) = asv_tab.mapping$OTUID
+asv_tab.mapping$OTUID = NULL
+#remove negative controls from both tables
+asv_tab = asv_tab[,!colnames(asv_tab) %in% colnames(asv_tab.negatives)]
+asv_tab.mapping = asv_tab.mapping[,!colnames(asv_tab.mapping) %in% colnames(asv_tab.negatives)]
+#BP225 did not make it trhough DDAA2 so has to be removed manually
+asv_tab.mapping$BP225 = NULL
+#############################
+#Nf and Nd counts (sum ASVs)#
+
 Nf_asvs = filter(data.frame(asv_tax, asv_name = rownames(asv_tax)), Species == "s__faginata")$asv_name
 Nd_asvs = filter(data.frame(asv_tax, asv_name = rownames(asv_tax)), Species == "s__ditissima")$asv_name
 
@@ -114,7 +116,38 @@ data.frame(Nf = Nf_counts, sample = names(Nf_counts)),
 data.frame(Nd = Nd_counts, sample = names(Nd_counts)),
 by = "sample")
 
-Nf_v_Nd.long = gather(Nf_v_Nd, "spp", "Neonectria_count", -sample)
+Nf_v_Nd.long = gather(Nf_v_Nd, "spp", "Neonectria_count.asv", -sample)
+
+#also do mapping file
+
+Nf_counts.mapping = subset(asv_tab.mapping, rownames(asv_tab.mapping) %in% Nf_asvs) %>% colSums
+Nd_counts.mapping = subset(asv_tab.mapping, rownames(asv_tab.mapping) %in% Nd_asvs) %>% colSums
+
+Nf_v_Nd.mapping = full_join(
+data.frame(Nf = Nf_counts.mapping, sample = names(Nf_counts.mapping)),
+data.frame(Nd = Nd_counts.mapping, sample = names(Nd_counts.mapping)),
+by = "sample")
+
+Nf_v_Nd.mapping.long = gather(Nf_v_Nd.mapping, "spp", "Neonectria_count.mapping", -sample)
+
+#join mapping and ASV counts
+Nf_Nd.asv_mapping_comp = full_join(Nf_v_Nd.long, Nf_v_Nd.mapping.long, by = c("sample", "spp"))
+#vsearch does not write files with zero counts, so add zero for NAs
+Nf_Nd.asv_mapping_comp[is.na(Nf_Nd.asv_mapping_comp)] = 0
+#add sample sequence totals from asv_tab
+Nf_Nd.asv_mapping_comp.w_counts = left_join(Nf_Nd.asv_mapping_comp,
+data.frame(sample = colnames(asv_tab), total_seqs = colSums(asv_tab))
+)
+
+#CAL AVG
+Nf_Nd.asv_mapping_comp$Neo_avg = (Nf_Nd.asv_mapping_comp$Neonectria_count.asv + Nf_Nd.asv_mapping_comp$Neonectria_count.mapping) / 2
+
+#remake count vectors
+Nf_counts = as.vector((filter(Nf_Nd.asv_mapping_comp, spp == "Nf") %>% select(Neo_avg))[[1]] )
+names(Nf_counts) = (filter(Nf_Nd.asv_mapping_comp, spp == "Nf") %>% select(sample))[[1]]
+
+Nd_counts = as.vector((filter(Nf_Nd.asv_mapping_comp, spp == "Nd") %>% select(Neo_avg))[[1]] )
+names(Nd_counts) = (filter(Nf_Nd.asv_mapping_comp, spp == "Nd") %>% select(sample))[[1]]
 
 ###########################
 #Nf and Nd occurence (0/1)#
@@ -157,3 +190,15 @@ data.frame(sample = track.long %>% filter(step == "nonchim") %>% select(sample),
 total_seqs = (track.long %>% filter(step == "nonchim"))$count),
 by = "sample"
 )
+
+##########################################################
+#Read in LULU filtered (93% minimum_simlarity) ASV table#
+#Also filter asv_tax based on retained ASVs###############
+
+asv_tab = read.table("LULU/asv_tab.LULU_93.txt", header = T)
+#remove negatives
+asv_tab = asv_tab[,!colnames(asv_tab) %in% colnames(asv_tab.negatives)]
+#remove zero sum asvs (though there actually are none)
+asv_tab = asv_tab[rowSums(asv_tab) > 1,]
+#Also filter asv_tax based on retained ASVs
+asv_tax = asv_tax[rownames(asv_tax) %in% rownames(asv_tab),]
