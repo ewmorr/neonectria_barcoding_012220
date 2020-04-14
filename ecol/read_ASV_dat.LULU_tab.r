@@ -62,11 +62,16 @@ id = "ASV", variable.name = "sample", value.name = "count") %>%
 data.frame
 
 ##########################################################
-#Read in LULU filtered (93% minimum_siimlarity) ASV table#
+#Read in LULU filtered (93% minimum_simlarity) ASV table#
 #Also filter asv_tax based on retained ASVs###############
 
-asv_tab = read.table("LULU/asv_tab/LULU_93.txt", header = T)
-asv_tax = subset(asv_tax, rownames %in% rownames(asv_tab))
+asv_tab = read.table("LULU/asv_tab.LULU_93.txt", header = T)
+#remove negatives
+asv_tab = asv_tab[,!colnames(asv_tab) %in% colnames(asv_tab.negatives)]
+#remove zero sum asvs (though there actually are none)
+asv_tab = asv_tab[rowSums(asv_tab) > 1,]
+#Also filter asv_tax based on retained ASVs
+asv_tax = asv_tax[rownames(asv_tax) %in% rownames(asv_tab),]
 
 #################################################
 #Process asv_tax for lowest informative taxonomy#

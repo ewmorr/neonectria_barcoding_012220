@@ -21,7 +21,7 @@ my_gg_theme = theme(
 
 
 #read data
-source("~/repo/neonectria_barcoding_012220/read_ASV_dat.r")
+source("~/repo/neonectria_barcoding_012220/ecol/read_ASV_dat.LULU_tab.r")
 #this pulls in objects:
 #asv_tab
 #asv_tax
