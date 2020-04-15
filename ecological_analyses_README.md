@@ -13,9 +13,10 @@ Rscript ~/repo/neonectria_barcoding_012220/PRISM_analysis/sites_climate_dat.r
 ```
 Analysis of samples and sequences dropped/retained at different rarefaction levels
 ```
+mkdir rarefaction_figs
 Rscript ~/repo/neonectria_barcoding_012220/ecol/sequence_subsampling_samples_seqs_dropped.r
 ```
-Run NMDS at rarefaction levels of 1K and 5K, also save rarefied tables
+Run NMDS at rarefaction levels of 1K and 5K, also save rarefied tables. This is performed after filtering out ASVs that occur in only one sample (`read_ASV_dat.LULU_tab.r`)
 ```
 Rscript ~/repo/neonectria_barcoding_012220/ecol/run_and_save_NMDS.r
 ```
@@ -27,5 +28,9 @@ Table of lowest informative taxon
 ```
 Rscript ~/repo/neonectria_barcoding_012220/ecol/lowest_reliable_taxon_table.r
 ```
-
+GAM fits and plots
+```
+mkdir GAM_fits
+Rscript ~/repo/neonectria_barcoding_012220/ecol/GAM_fits_NMDS.r
+```
 ##### extract nectriaceae and/or neonectria ASV seqs and perform phylogenetic analyses

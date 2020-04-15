@@ -91,7 +91,7 @@ labs(title = paste("199 samples, ", total_seqs, "sequences, 858 taxa"), x = "sam
 annotate(x = 100, y = 75, geom = "text", size = 6, label = paste("rarefy 1K sequences: ", samples_dropped.1k, "samples dropped\n", seqs_dropped.1k, "seqs dropped, ", total_taxa - avg_taxa.1k, " taxa dropped\navg taxa", avg_taxa.1k, "+/-", signif(sd_taxa.1k,2), "stdev")) +
 annotate(x = 100, y = 10^5, geom = "text", size = 6, label = paste("rarefy 5K sequences: ", samples_dropped.5k, "samples dropped\n", seqs_dropped.5k, "seqs dropped, ", total_taxa - avg_taxa.5k, " taxa dropped\navg taxa", avg_taxa.5k, "+/-", signif(sd_taxa.5k,2), "stdev"))
 
-pdf("prelim_figs/sequence_subsampling.pdf", width = 8, height = 6)
+pdf("rarefaction_figs/sequence_subsampling.pdf", width = 8, height = 6)
 print(p)
 dev.off()
 
@@ -112,8 +112,8 @@ protox <- mapply(FUN = function(x, y) {
 }, x = asv_tab.no_singletons.rare_curve, y = as.list(names(asv_tab.no_singletons.rare_curve)), SIMPLIFY = FALSE)
 
 xy <- do.call(rbind, protox)
-xy = rbind(protox)
 rownames(xy) <- NULL  # pretty
+
 
 p1 = ggplot(xy, aes(x = subsample, y = value, group = sample)) +
 geom_vline(xintercept = 1000) +
@@ -149,7 +149,7 @@ labs(y = "ASVs", x = "sequences subsampled")
 
 require(gridExtra)
 
-pdf("prelim_figs/rarefaction_curves.pdf", width = 16, height = 10)
+pdf("rarefaction_figs/rarefaction_curves.pdf", width = 16, height = 10)
 grid.arrange(p1,p2,p3,p4, ncol = 2)
 dev.off()
 
@@ -158,3 +158,35 @@ spp_rich_rarefy.1k = rarefy(asv_tab.no_singletons.t[rowSums(asv_tab.no_singleton
 
 spp_rich_rarefy.5k = rarefy(asv_tab.no_singletons.t[rowSums(asv_tab.no_singletons.t) >= 5000,], sample = 5000)
 
+
+
+
+#try stricter filtering
+
+
+length(rownames(asv_tab))
+
+n_samples = length(colnames(asv_tab))
+n_asvs = length(rownames(asv_tab))
+
+#filter out taxa that only occur in one sample
+
+asv_counts = data.frame(
+sample_min = vector(mode = "numeric", length = n_samples),
+asv_remaining = vector(mode = "numeric", length = n_samples)
+)
+
+for(i in 1:n_samples){
+    temp_tab = asv_tab[rowSums(asv_tab > 0) > i,]
+    asv_counts$asv_remaining[i] = length(rownames(temp_tab))
+    asv_counts$sample_min[i] = i+1
+}
+
+p = ggplot(asv_counts, aes(sample_min, asv_remaining)) +
+geom_point() +
+my_gg_theme +
+labs(x = "minimum sample frequency", y = "ASVs remaining")
+
+pdf("rarefaction_figs/asv_frequency_filtering.pdf",width = 8, height = 6)
+print(p)
+dev.off()

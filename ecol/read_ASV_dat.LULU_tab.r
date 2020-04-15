@@ -200,5 +200,7 @@ asv_tab = read.table("LULU/asv_tab.LULU_93.txt", header = T)
 asv_tab = asv_tab[,!colnames(asv_tab) %in% colnames(asv_tab.negatives)]
 #remove zero sum asvs (though there actually are none)
 asv_tab = asv_tab[rowSums(asv_tab) > 1,]
+#filter out taxa that only occur in one sample
+asv_tab = asv_tab[rowSums(asv_tab > 0) > 1,]
 #Also filter asv_tax based on retained ASVs
 asv_tax = asv_tax[rownames(asv_tax) %in% rownames(asv_tab),]
