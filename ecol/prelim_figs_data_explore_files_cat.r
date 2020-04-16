@@ -23,7 +23,7 @@ cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
 cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 #read data
-source("~/repo/neonectria_barcoding_012220/read_ASV_dat.r")
+source("~/repo/neonectria_barcoding_012220/ecol/read_ASV_dat.LULU_tab.r")
 #this pulls in objects:
 #asv_tab
 #asv_tax
@@ -162,7 +162,7 @@ scale_color_gradient(name = "Annual\nprecip.")+
 labs(title = "Average annual precipitation", y = "")
 
 
-pdf("prelim_figs/NMDS_neo_occurence_by_climate_1Kmin.pdf", width = 22, height = 12)
+pdf("NMDS_fits/NMDS_neo_occurence_by_climate_1Kmin.pdf", width = 22, height = 12)
 grid.arrange(p2,p3,p5,p1,p4,p6,nrow = 2)
 dev.off()
 
@@ -217,7 +217,7 @@ scale_color_gradient(name = "Xylococcus")+
 labs(title = "Mean Xylococcus", y = "")
 
 
-pdf("prelim_figs/NMDS_neo_occurence_by_disease_severity_1Kmin.pdf", width = 22, height = 12)
+pdf("NMDS_fits/NMDS_neo_occurence_by_disease_severity_1Kmin.pdf", width = 22, height = 12)
 grid.arrange(p1,p2,p3,p4,p5,p6,nrow = 2)
 dev.off()
 
@@ -601,7 +601,7 @@ scale_color_gradient(name = "Annual\nprecip.")+
 labs(title = "Average annual precipitation", y = "")
 
 
-pdf("prelim_figs/NMDS_neo_occurence_by_climate_5Kmin.pdf", width = 22, height = 12)
+pdf("NMDS_fits/NMDS_neo_occurence_by_climate_5Kmin.pdf", width = 22, height = 12)
 grid.arrange(p2,p3,p5,p1,p4,p6,nrow = 2)
 dev.off()
 
@@ -656,7 +656,7 @@ scale_color_gradient(name = "Xylococcus")+
 labs(title = "Mean Xylococcus", y = "")
 
 
-pdf("prelim_figs/NMDS_neo_occurence_by_disease_severity_5Kmin.pdf", width = 22, height = 12)
+pdf("NMDS_fits/NMDS_neo_occurence_by_disease_severity_5Kmin.pdf", width = 22, height = 12)
 grid.arrange(p1,p2,p3,p4,p5,p6,nrow = 2)
 dev.off()
 

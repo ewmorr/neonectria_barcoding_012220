@@ -17,6 +17,12 @@ mkdir rarefaction_figs
 Rscript ~/repo/neonectria_barcoding_012220/ecol/sequence_subsampling_samples_seqs_dropped.r
 ```
 Run NMDS at rarefaction levels of 1K and 5K, also save rarefied tables. This is performed after filtering out ASVs that occur in only one sample (`read_ASV_dat.LULU_tab.r`)
+First running stress v k
+```
+mkdir NMDS_fits
+Rscript ~/repo/neonectria_barcoding_012220/ecol/NMDS_stress_v_k.r
+```
+No convergence at k=2, filtering ASVs at higher min frequency (e.g., 2 sample min occurence, 3 sample min occurence) results in no reduction in stress values at a given k. using k = 3 and ecluding singletons (single sample) ASVs
 ```
 Rscript ~/repo/neonectria_barcoding_012220/ecol/run_and_save_NMDS.r
 ```
