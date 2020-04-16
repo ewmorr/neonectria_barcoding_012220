@@ -8,8 +8,12 @@ cd ~/GARNAS_neonectria_barcoding_files_cat_03242020
 
 Make table of site-wide averages for ancillary data
 ```
-Rscript ~/repo/neonectria_barcoding_012220/files_cat/site_averages_on_transects_data.r
+Rscript ~/repo/neonectria_barcoding_012220/ecol/site_averages_on_transects_data.r
 Rscript ~/repo/neonectria_barcoding_012220/PRISM_analysis/sites_climate_dat.r
+```
+Pairwise comps of site dat
+```
+Rscript ~/repo/neonectria_barcoding_012220/ecol/pairwise_comps_site_dat.r
 ```
 Analysis of samples and sequences dropped/retained at different rarefaction levels
 ```
@@ -39,4 +43,6 @@ GAM fits and plots
 mkdir GAM_fits
 Rscript ~/repo/neonectria_barcoding_012220/ecol/GAM_fits_NMDS.r
 ```
+
+### sum samples at tree level
 ##### extract nectriaceae and/or neonectria ASV seqs and perform phylogenetic analyses
