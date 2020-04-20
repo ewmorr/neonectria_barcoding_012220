@@ -1,4 +1,4 @@
-LULU ASV filtering (Froslev et al. 2017, Nature Communications, 8(1), 1188). This is performed on files that were processed for read quality and ITS extracted. Files from separarte runs were then concatenated by sample and DADA2 ASV calling with `pool = T` was performed.
+LULU ASV filtering (Froslev et al. 2017, Nature Communications, 8(1), 1188). This is performed on files that were processed for read quality and ITS extracted. Files from separate runs were then concatenated by sample and DADA2 ASV calling with `pool = T` was performed.
 
 for install `https://github.com/tobiasgf/lulu`
 

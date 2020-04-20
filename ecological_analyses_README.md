@@ -5,7 +5,7 @@ This is data that has been processed by first quality filtering and ITS extactio
 ```
 cd ~/GARNAS_neonectria_barcoding_files_cat_03242020
 ```
-
+#### Site level data
 Make table of site-wide averages for ancillary data
 ```
 Rscript ~/repo/neonectria_barcoding_012220/ecol/site_averages_on_transects_data.r
@@ -15,12 +15,12 @@ Pairwise comps of site dat
 ```
 Rscript ~/repo/neonectria_barcoding_012220/ecol/pairwise_comps_site_dat.r
 ```
-Analysis of samples and sequences dropped/retained at different rarefaction levels
+#### Analysis of samples and sequences dropped/retained at different rarefaction levels
 ```
 mkdir rarefaction_figs
 Rscript ~/repo/neonectria_barcoding_012220/ecol/sequence_subsampling_samples_seqs_dropped.r
 ```
-Run NMDS at rarefaction levels of 1K and 5K, also save rarefied tables. This is performed after filtering out ASVs that occur in only one sample (`read_ASV_dat.LULU_tab.r`)
+#### Run NMDS at rarefaction levels of 1K and 5K, also save rarefied tables. This is performed after filtering out ASVs that occur in only one sample (`read_ASV_dat.LULU_tab.r`)
 First running stress v k
 ```
 mkdir NMDS_fits
@@ -30,7 +30,8 @@ No convergence at k=2, filtering ASVs at higher min frequency (e.g., 2 sample mi
 ```
 Rscript ~/repo/neonectria_barcoding_012220/ecol/run_and_save_NMDS.r
 ```
-prelim figs (NMDS, site frequency Nf/Nd, richness etc)
+#### prelim figs
+(NMDS, site frequency Nf/Nd, richness etc)
 ```
 Rscript ~/repo/neonectria_barcoding_012220/ecol/prelim_figs_data_explore_files_cat.r
 ```
