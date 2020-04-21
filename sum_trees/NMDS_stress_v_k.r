@@ -23,6 +23,10 @@ source("~/repo/neonectria_barcoding_012220/ecol/read_ASV_dat.LULU_tab.r")
 #Nf_v_Nd.long.metadata
 #Nf_v_Nd.bin.metadata
 
+#Sum asv counts at the tree level
+source("~/repo/neonectria_barcoding_012220/sum_trees/sum_ASV_counts_by_tree.r")
+
+asv_tab = asv_tab.tree_sum
 
 ######
 #NMDS#
@@ -122,7 +126,7 @@ theme(plot.title = element_text(size = 15))
 
 
 require(gridExtra)
-pdf("NMDS_fits/k_v_stress_1Kseqs_noSingletons.pdf", width = 12, height = 4)
+pdf("NMDS_fits/k_v_stress_1Kseqs_noSingletons.sum_trees.pdf", width = 12, height = 4)
 grid.arrange(p1,p2,ncol = 2)
 dev.off()
 
@@ -207,7 +211,7 @@ labs(title = "Presence-absence\nStress = 0 -- no convergence after 26 runs") +
 my_gg_theme +
 theme(plot.title = element_text(size = 15))
 
-pdf("NMDS_fits/k_v_stress_1Kseqs_noDoubletons.pdf", width = 12, height = 4)
+pdf("NMDS_fits/k_v_stress_1Kseqs_noDoubletons.sum_trees.pdf", width = 12, height = 4)
 grid.arrange(p1,p2,ncol = 2)
 dev.off()
 
@@ -292,6 +296,6 @@ labs(title = "Presence-absence\nStress = 0 -- no convergence after 26 runs") +
 my_gg_theme +
 theme(plot.title = element_text(size = 15))
 
-pdf("NMDS_fits/k_v_stress_1Kseqs_noTripletons.pdf", width = 12, height = 4)
+pdf("NMDS_fits/k_v_stress_1Kseqs_noTripletons.sum_trees.pdf", width = 12, height = 4)
 grid.arrange(p1,p2,ncol = 2)
 dev.off()

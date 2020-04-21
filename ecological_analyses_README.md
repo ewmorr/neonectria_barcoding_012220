@@ -45,5 +45,24 @@ mkdir GAM_fits
 Rscript ~/repo/neonectria_barcoding_012220/ecol/GAM_fits_NMDS.r
 ```
 
-### sum samples at tree level
+### sum samples at tree level and rerunning above analyses (rarefaction, NMDS, GAM fits)
+Rarefaction
+```
+Rscript ~/repo/neonectria_barcoding_012220/sum_trees/sequence_subsampling_samples_seqs_dropped.r
+```
+NMDS stress v k
+```
+Rscript ~/repo/neonectria_barcoding_012220/sum_trees/NMDS_stress_v_k.r
+```
+Run NMDS, k = 3, singletons removed
+```
+Rscript ~/repo/neonectria_barcoding_012220/sum_trees/run_and_save_NMDS.r
+```
+GAM fits
+```
+Rscript ~/repo/neonectria_barcoding_012220/sum_trees/GAM_fits_NMDS.r
+```
+
+
+
 ##### extract nectriaceae and/or neonectria ASV seqs and perform phylogenetic analyses
