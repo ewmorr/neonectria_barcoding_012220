@@ -292,3 +292,7 @@ asv_tax = asv_tax[rownames(asv_tax) %in% rownames(asv_tab),]
 #replace original matdata w/ transformed df#
 
 full_metadata = full_metadata.site_tree
+total_seqs = data.frame(sample = colnames(asv_tab), total_seqs = colSums(asv_tab))
+full_metadata = full_join(full_metadata, total_seqs, by = "sample")
+Nf_v_Nd.long.metadata = full_join(Nf_v_Nd.long.metadata, total_seqs, by = "sample")
+Nf_v_Nd.bin.metadata = full_join(Nf_v_Nd.bin.metadata, total_seqs, by = "sample")

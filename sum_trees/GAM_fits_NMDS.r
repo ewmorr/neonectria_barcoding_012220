@@ -21,7 +21,7 @@ my_gg_theme = theme(
 
 
 #read data
-source("~/repo/neonectria_barcoding_012220/ecol/read_ASV_dat.LULU_tab.r")
+source("~/repo/neonectria_barcoding_012220/sum_trees/read_ASV_dat.LULU_tab.r")
 #this pulls in objects:
 #asv_tab
 #asv_tax
@@ -37,19 +37,9 @@ source("~/repo/neonectria_barcoding_012220/ecol/read_ASV_dat.LULU_tab.r")
 #asv_informative_taxa
 #asv_tax.char
 
-#and calcuduration_infectiones neonectria occurence in objects:
+#and calc duration_infectiones neonectria occurence in objects:
 #Nf_v_Nd.long.metadata
 #Nf_v_Nd.bin.metadata
-
-#Sum asv counts at the tree level
-source("~/repo/neonectria_barcoding_012220/sum_trees/sum_ASV_counts_by_tree.r")
-asv_tab = asv_tab.tree_sum
-
-#For joins change sample label to Site.tree
-full_metadata = full_metadata %>% filter(bench.control == "n")
-full_metadata$sample = paste(as.character(full_metadata$Site), as.character(full_metadata$Tree), sep = ".")
-
-full_metadata = full_metadata %>% distinct(sample, .keep_all = T)
 
 #######
 #PLOTS#

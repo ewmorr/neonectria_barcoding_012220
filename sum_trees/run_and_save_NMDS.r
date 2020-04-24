@@ -1,7 +1,7 @@
 require(vegan)
 
 #read data
-source("~/repo/neonectria_barcoding_012220/ecol/read_ASV_dat.LULU_tab.r")
+source("~/repo/neonectria_barcoding_012220/sum_trees/read_ASV_dat.LULU_tab.r")
 #this pulls in objects:
 #asv_tab
 #asv_tax
@@ -21,10 +21,6 @@ source("~/repo/neonectria_barcoding_012220/ecol/read_ASV_dat.LULU_tab.r")
 #Nf_v_Nd.long.metadata
 #Nf_v_Nd.bin.metadata
 
-#Sum asv counts at the tree level
-source("~/repo/neonectria_barcoding_012220/sum_trees/sum_ASV_counts_by_tree.r")
-
-asv_tab = asv_tab.tree_sum
 
 ######
 #NMDS#

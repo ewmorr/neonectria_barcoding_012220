@@ -2,25 +2,7 @@ require(tidyverse)
 require(vegan)
 require(gridExtra)
 require(RColorBrewer)
-
-my_gg_theme = theme(
-    panel.background = element_rect(fill='white', colour='black'),
-    panel.grid.major=element_blank(),
-    panel.grid.minor= element_blank(),
-    text=element_text(family="sans"),
-    axis.text=element_text(size=15, color="black"),
-    axis.ticks = element_line(color = "black"),
-    plot.title = element_text(hjust=0, size=20),
-    axis.title = element_text(size=17),
-    legend.title = element_blank(),
-    legend.text = element_text(size = 19),
-    strip.text = element_text(size = 15),
-    axis.title.x = element_text(margin = margin(t= 10)),
-    axis.title.y = element_text(margin = margin(r=10))
-)
-
-cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+source("~/ggplot_theme.txt")
 
 #read data
 source("~/repo/neonectria_barcoding_012220/sum_trees/read_ASV_dat.LULU_tab.r")
@@ -47,14 +29,17 @@ source("~/repo/neonectria_barcoding_012220/sum_trees/read_ASV_dat.LULU_tab.r")
 #PLOTS#
 
 #Neo occurence across sites, trees, plugs
-pdf("prelim_figs/Neo_occurence_min_100_seqs_per_sample_dur_inf_MAT.pdf", width = 16)
-ggplot(Nf_v_Nd.bin.metadata %>% filter(total_seqs > 100 & bench.control == "n"), aes(as.factor(Tree), ..count.., fill = occurence)) +
-geom_histogram(stat = "count", width = 0.9, color = "black") +
-facet_wrap(duration_infection~signif(MAT, 2), scales = "free_x", ncol = 5) +
+pdf("prelim_figs/Neo_occurence_min_100_seqs_per_sample_dur_inf_state-lat.tree_sum.pdf", width = 16)
+ggplot(Nf_v_Nd.bin.metadata %>% filter(total_seqs > 100), aes(as.factor(Tree), total_seqs, fill = occurence)) +
+geom_col(width = 0.9, color = "black") +
+facet_wrap(paste(duration_infection, "yrs inf", "\n",State)~paste("lat    lon\n",signif(lat,3), signif(lon,3), sep = " "), scales = "free_x", ncol = 5) +
 scale_fill_manual(values = rev(cbPalette[1:4])) +
-labs(x = "Trees", y = "count (plugs)") +
+scale_y_log10(labels = fancy_scientific) +
+labs(x = "Trees", y = "sequences log10") +
 my_gg_theme +
-theme(axis.text.x = element_blank())
+#geom_hline(yintercept = 1000) +
+labs(fill = "Neonectria\noccurence") +
+theme(axis.text.x = element_blank(), legend.title = element_text(size = 18))
 dev.off()
 
 
@@ -65,9 +50,9 @@ dev.off()
 #1000 seqs per sample min#
 
 #rarefied table
-asv_tab.gt1K.rare = readRDS(file = "intermediate_RDS/asv_tab.gt1K.rare.rds")
+asv_tab.gt1K.rare = readRDS(file = "intermediate_RDS/asv_tab.gt1K.rare.tree_sum.rds")
 #NMDS
-asv_tab.gt1K.rare.mds = readRDS(file = "intermediate_RDS/asv_tab.gt1K.rare.mds.rds")
+asv_tab.gt1K.rare.mds = readRDS(file = "intermediate_RDS/asv_tab.gt1K.rare.mds.tree_sum.rds")
 
 #Add metadata
 
@@ -82,7 +67,7 @@ asv_tab.gt1K.rare.mds.metadata.neoOcurence$Site = factor(asv_tab.gt1K.rare.mds.m
 
 #climate/continental scale vars
 
-p1 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = duration_infection, shape = occurence)) +
+p1 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = duration_infection, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -90,7 +75,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "Infection\nduration") +
 labs(title = "Infection duration")
 
-p2 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, shape = occurence, color = Site)) +
+p2 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, shape = occurence, color = Site)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -99,7 +84,7 @@ scale_color_brewer(palette = "Paired", name = "Site", labels = c("ADS1" = "NY so
 )+
 labs(title = "Site", x = "")
 
-p3 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = tmin, shape = occurence)) +
+p3 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = tmin, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -107,7 +92,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "Min.\ntemp.")+
 labs(title = "Average minimum temperature", y = "", x = "")
 
-p4 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = MAT, shape = occurence)) +
+p4 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = MAT, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -115,7 +100,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "MAT")+
 labs(title = "MAT", y = "")
 
-p5 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = tmax, shape = occurence)) +
+p5 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = tmax, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -123,7 +108,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "Max.\ntemp.")+
 labs(title = "Average maximum temperature", y = "", x = "")
 
-p6 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = ppt, shape = occurence)) +
+p6 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = ppt, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -132,13 +117,13 @@ scale_color_gradient(name = "Annual\nprecip.")+
 labs(title = "Average annual precipitation", y = "")
 
 
-pdf("NMDS_fits/NMDS_neo_occurence_by_climate_1Kmin.pdf", width = 22, height = 12)
+pdf("NMDS_fits/NMDS_neo_occurence_by_climate_1Kmin.tree_sum.pdf", width = 22, height = 12)
 grid.arrange(p2,p3,p5,p1,p4,p6,nrow = 2)
 dev.off()
 
 #Disease severity vars
 
-p1 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, shape = occurence, color = Site_mean.dbh)) +
+p1 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, shape = occurence, color = Site_mean.dbh)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -146,7 +131,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "DBH")+
 labs(title = "DBH (cm)", x = "")
 
-p2 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = Site_mean.NeoFruiting, shape = occurence)) +
+p2 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = Site_mean.NeoFruiting, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -154,7 +139,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "Neonectria\nfruting")+
 labs(title = "Mean neonectria fruiting (0-5)", y = "", x = "")
 
-p3 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = Site_mean.Wax, shape = occurence)) +
+p3 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = Site_mean.Wax, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -162,7 +147,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "Wax")+
 labs(title = "Mean wax load (0-5)", y = "")
 
-p4 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = Site_mean.RaisedCanker, shape = occurence)) +
+p4 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = Site_mean.RaisedCanker, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -170,7 +155,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "Cankers")+
 labs(title = "Mean cankers", y = "", x = "")
 
-p5 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = Site_mean.TreeCond, shape = occurence)) +
+p5 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = Site_mean.TreeCond, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -178,7 +163,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "Tree\ncondition")+
 labs(title = "Mean tree condition (0-5)", y = "")
 
-p6 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = Site_mean.Xylococcus, shape = occurence)) +
+p6 = ggplot(asv_tab.gt1K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = Site_mean.Xylococcus, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -187,7 +172,7 @@ scale_color_gradient(name = "Xylococcus")+
 labs(title = "Mean Xylococcus", y = "")
 
 
-pdf("NMDS_fits/NMDS_neo_occurence_by_disease_severity_1Kmin.pdf", width = 22, height = 12)
+pdf("NMDS_fits/NMDS_neo_occurence_by_disease_severity_1Kmin.tree_sum.pdf", width = 22, height = 12)
 grid.arrange(p1,p2,p3,p4,p5,p6,nrow = 2)
 dev.off()
 
@@ -195,7 +180,7 @@ dev.off()
 ##############################
 #Neonectria frequency by site#
 
-sites_nmds = asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n") %>% select(Site) %>% unique
+sites_nmds = asv_tab.gt1K.rare.mds.metadata.neoOcurence %>% select(Site) %>% unique
 
 Nf_Nd_site_freq = data.frame(Site = vector(mode = "character", length = length(sites_nmds$Site)),
 Nf = vector(mode = "numeric", length = length(sites_nmds$Site)),
@@ -281,7 +266,7 @@ labs(y = "", x = "Average min. temp.") +
 #scale_color_brewer(palette = "Dark2") +
 my_gg_theme
 
-pdf("prelim_figs/Neonectria_frequency_by_duration_infection_and_climate_1K_min.pdf", width = 25, height = 8)
+pdf("prelim_figs/Neonectria_frequency_by_duration_infection_and_climate_1K_min.tree_sum.pdf", width = 25, height = 8)
 grid.arrange(p1,p7,p3,p9,p5,p2,p8,p4,p10,p6,nrow= 2)
 dev.off()
 
@@ -350,7 +335,7 @@ labs(y = "", x = "Mean tree condition (0-5)") +
 #scale_color_brewer(palette = "Dark2") +
 my_gg_theme
 
-pdf("prelim_figs/Neonectria_frequency_by_disease_severity_1K_min.pdf", width = 25, height = 8)
+pdf("prelim_figs/Neonectria_frequency_by_disease_severity_1K_min.tree_sum.pdf", width = 25, height = 8)
 grid.arrange(p1,p3,p5,p7,p9,p2,p4,p6,p8,p10,nrow= 2)
 dev.off()
 
@@ -358,20 +343,14 @@ dev.off()
 #Richness by duration_infection etc#
 
 sample_richness = data.frame(sample = names(apply(asv_tab.gt1K.rare,1,function(x) sum(x > 0))), richness =  apply(asv_tab.gt1K.rare,1,function(x) sum(x > 0)))
-sample_richness.metadata = left_join(sample_richness, id_bench_map) %>%
-left_join(., metadata_map)
-
-
-sample_richness.metadata.site_info = left_join(sample_richness.metadata, Nf_v_Nd.bin) %>%
-    left_join(., site_info, by = "Site") %>%
-left_join(., site_climate) %>%
-left_join(., site_means, by = "Site")
+sample_richness.metadata = left_join(sample_richness, full_metadata, by = "sample")
+sample_richness.metadata.site_info = left_join(sample_richness.metadata, Nf_v_Nd.bin)
 
 sample_richness.metadata.site_info$Site = factor(sample_richness.metadata.site_info$Site, levels = c("MEN1", "MES1", "ADN1", "ADS1", "CW1", "TSP1", "GK1j", "ASH2", "MI1", "WF1"))
 
 #continental scale vars
 
-p1 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(Site, richness, group = Site, color = Site)) +
+p1 = ggplot(sample_richness.metadata.site_info, aes(Site, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "ASV richness\nper 1K sequences", x = "Site") +
@@ -381,7 +360,7 @@ guide = F
 my_gg_theme +
 scale_x_discrete(labels = c(rep("", 10)))
 
-p2 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(duration_infection, richness, group = Site, color = Site)) +
+p2 = ggplot(sample_richness.metadata.site_info, aes(duration_infection, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "ASV richness\nper 1K sequences", x = "Infection duration") +
@@ -390,7 +369,7 @@ guide = F
 ) +
 my_gg_theme
 
-p3 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(tmin, richness, group = Site, color = Site)) +
+p3 = ggplot(sample_richness.metadata.site_info, aes(tmin, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "Average minimum temperature") +
@@ -399,7 +378,7 @@ guide = F
 ) +
 my_gg_theme
 
-p4 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(MAT, richness, group = Site, color = Site)) +
+p4 = ggplot(sample_richness.metadata.site_info, aes(MAT, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "MAT") +
@@ -408,7 +387,7 @@ guide = F
 ) +
 my_gg_theme
 
-p5 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(tmax, richness, group = Site, color = Site)) +
+p5 = ggplot(sample_richness.metadata.site_info, aes(tmax, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "Average maximum temperature") +
@@ -416,7 +395,7 @@ scale_color_brewer(palette = "Paired", name = "Site", labels = c("ADS1" = "NY so
 ) +
 my_gg_theme
 
-p6 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(ppt, richness, group = Site, color = Site)) +
+p6 = ggplot(sample_richness.metadata.site_info, aes(ppt, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "Average annual precipitation") +
@@ -424,14 +403,14 @@ scale_color_brewer(palette = "Paired", name = "Site", labels = c("ADS1" = "NY so
 ) +
 my_gg_theme
 
-pdf("prelim_figs/ASV_richness_by_climate_1K_min.pdf", width = 24, height = 8)
+pdf("prelim_figs/ASV_richness_by_climate_1K_min.tree_sum.pdf", width = 24, height = 8)
 grid.arrange(p1,p3,p5,p2,p4,p6,nrow = 2, widths = c(0.31,0.31,0.38))
 dev.off()
 
 #site/diseaxe severity vars
 
 
-p1 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(Site_mean.dbh, richness, group = Site, color = Site)) +
+p1 = ggplot(sample_richness.metadata.site_info, aes(Site_mean.dbh, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "ASV richness\nper 1K sequences", x = "DBH") +
@@ -441,7 +420,7 @@ guide = F
 my_gg_theme +
 scale_x_discrete(labels = c(rep("", 10)))
 
-p2 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(Site_mean.NeoFruiting, richness, group = Site, color = Site)) +
+p2 = ggplot(sample_richness.metadata.site_info, aes(Site_mean.NeoFruiting, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "ASV richness\nper 1K sequences", x = "Mean neonectria fruiting (0-5)") +
@@ -450,7 +429,7 @@ guide = F
 ) +
 my_gg_theme
 
-p3 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(Site_mean.Wax, richness, group = Site, color = Site)) +
+p3 = ggplot(sample_richness.metadata.site_info, aes(Site_mean.Wax, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "Mean wax load (0-5)") +
@@ -459,7 +438,7 @@ guide = F
 ) +
 my_gg_theme
 
-p4 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(Site_mean.RaisedCanker, richness, group = Site, color = Site)) +
+p4 = ggplot(sample_richness.metadata.site_info, aes(Site_mean.RaisedCanker, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "Mean cankers") +
@@ -468,7 +447,7 @@ guide = F
 ) +
 my_gg_theme
 
-p5 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(Site_mean.TreeCond, richness, group = Site, color = Site)) +
+p5 = ggplot(sample_richness.metadata.site_info, aes(Site_mean.TreeCond, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "Meantree condition (0-5)") +
@@ -476,7 +455,7 @@ scale_color_brewer(palette = "Paired", name = "Site", labels = c("ADS1" = "NY so
 ) +
 my_gg_theme
 
-p6 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(Site_mean.Xylococcus, richness, group = Site, color = Site)) +
+p6 = ggplot(sample_richness.metadata.site_info, aes(Site_mean.Xylococcus, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "Mean Xylococcus") +
@@ -484,13 +463,13 @@ scale_color_brewer(palette = "Paired", name = "Site", labels = c("ADS1" = "NY so
 ) +
 my_gg_theme
 
-pdf("prelim_figs/ASV_richness_by_disease_severity_1K_min.pdf", width = 24, height = 8)
+pdf("prelim_figs/ASV_richness_by_disease_severity_1K_min.tree_sum.pdf", width = 24, height = 8)
 grid.arrange(p1,p3,p5,p2,p4,p6,nrow = 2, widths = c(0.31,0.31,0.38))
 dev.off()
 
 #Neo occurence
 
-pdf("prelim_figs/ASV_richness_by_neo_occurence_1K_min.pdf", width = 8, height = 4)
+pdf("prelim_figs/ASV_richness_by_neo_occurence_1K_min.tree_sum.pdf", width = 8, height = 4)
 ggplot(sample_richness.metadata.site_info , aes(occurence, richness)) +
 geom_boxplot(width = .25) +
 #facet_wrap(~run.seq) +
@@ -504,9 +483,9 @@ dev.off()
 #5000 seqs per sample min#
 
 #rarefied table
-asv_tab.gt5K.rare = readRDS(file = "intermediate_RDS/asv_tab.gt5K.rare.rds")
+asv_tab.gt5K.rare = readRDS(file = "intermediate_RDS/asv_tab.gt5K.rare.tree_sum.rds")
 #NMDS
-asv_tab.gt5K.rare.mds = readRDS(file = "intermediate_RDS/asv_tab.gt5K.rare.mds.rds")
+asv_tab.gt5K.rare.mds = readRDS(file = "intermediate_RDS/asv_tab.gt5K.rare.mds.tree_sum.rds")
 
 #Add metadata
 
@@ -521,7 +500,7 @@ asv_tab.gt5K.rare.mds.metadata.neoOcurence$Site = factor(asv_tab.gt5K.rare.mds.m
 
 #climate/continental scale vars
 
-p1 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = duration_infection, shape = occurence)) +
+p1 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = duration_infection, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -529,7 +508,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "Infection\nduration") +
 labs(title = "Infection duration")
 
-p2 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, shape = occurence, color = Site)) +
+p2 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, shape = occurence, color = Site)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -538,7 +517,7 @@ scale_color_brewer(palette = "Paired", name = "Site", labels = c("ADS1" = "NY so
 )+
 labs(title = "Site", x = "")
 
-p3 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = tmin, shape = occurence)) +
+p3 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = tmin, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -546,7 +525,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "Min.\ntemp.")+
 labs(title = "Average minimum temperature", y = "", x = "")
 
-p4 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = MAT, shape = occurence)) +
+p4 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = MAT, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -554,7 +533,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "MAT")+
 labs(title = "MAT", y = "")
 
-p5 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = tmax, shape = occurence)) +
+p5 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = tmax, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -562,7 +541,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "Max.\ntemp.")+
 labs(title = "Average maximum temperature", y = "", x = "")
 
-p6 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = ppt, shape = occurence)) +
+p6 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = ppt, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -571,13 +550,13 @@ scale_color_gradient(name = "Annual\nprecip.")+
 labs(title = "Average annual precipitation", y = "")
 
 
-pdf("NMDS_fits/NMDS_neo_occurence_by_climate_5Kmin.pdf", width = 22, height = 12)
+pdf("NMDS_fits/NMDS_neo_occurence_by_climate_5Kmin.tree_sum.pdf", width = 22, height = 12)
 grid.arrange(p2,p3,p5,p1,p4,p6,nrow = 2)
 dev.off()
 
 #Disease severity vars
 
-p1 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, shape = occurence, color = Site_mean.dbh)) +
+p1 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, shape = occurence, color = Site_mean.dbh)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -585,7 +564,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "DBH")+
 labs(title = "DBH (cm)", x = "")
 
-p2 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = Site_mean.NeoFruiting, shape = occurence)) +
+p2 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = Site_mean.NeoFruiting, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -593,7 +572,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "Neonectria\nfruting")+
 labs(title = "Mean neonectria fruiting (0-5)", y = "", x = "")
 
-p3 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = Site_mean.Wax, shape = occurence)) +
+p3 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = Site_mean.Wax, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -601,7 +580,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "Wax")+
 labs(title = "Mean wax load (0-5)", y = "")
 
-p4 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = Site_mean.RaisedCanker, shape = occurence)) +
+p4 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = Site_mean.RaisedCanker, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -609,7 +588,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "Cankers")+
 labs(title = "Mean cankers", y = "", x = "")
 
-p5 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = Site_mean.TreeCond, shape = occurence)) +
+p5 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = Site_mean.TreeCond, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -617,7 +596,7 @@ scale_shape_manual(name = "Neonectria\noccurence", values = c(16,15,17,3), label
 scale_color_gradient(name = "Tree\ncondition")+
 labs(title = "Mean tree condition (0-5)", y = "")
 
-p6 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n"), aes(MDS1, MDS2, color = Site_mean.Xylococcus, shape = occurence)) +
+p6 = ggplot(asv_tab.gt5K.rare.mds.metadata.neoOcurence, aes(MDS1, MDS2, color = Site_mean.Xylococcus, shape = occurence)) +
 geom_point(size = 5) +
 my_gg_theme +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
@@ -626,7 +605,7 @@ scale_color_gradient(name = "Xylococcus")+
 labs(title = "Mean Xylococcus", y = "")
 
 
-pdf("NMDS_fits/NMDS_neo_occurence_by_disease_severity_5Kmin.pdf", width = 22, height = 12)
+pdf("NMDS_fits/NMDS_neo_occurence_by_disease_severity_5Kmin.tree_sum.pdf", width = 22, height = 12)
 grid.arrange(p1,p2,p3,p4,p5,p6,nrow = 2)
 dev.off()
 
@@ -634,7 +613,7 @@ dev.off()
 ##############################
 #Neonectria frequency by site#
 
-sites_nmds = asv_tab.gt5K.rare.mds.metadata.neoOcurence %>% filter(bench.control == "n") %>% select(Site) %>% unique
+sites_nmds = asv_tab.gt5K.rare.mds.metadata.neoOcurence %>% select(Site) %>% unique
 
 Nf_Nd_site_freq = data.frame(Site = vector(mode = "character", length = length(sites_nmds$Site)),
 Nf = vector(mode = "numeric", length = length(sites_nmds$Site)),
@@ -720,7 +699,7 @@ labs(y = "", x = "Average min. temp.") +
 #scale_color_brewer(palette = "Dark2") +
 my_gg_theme
 
-pdf("prelim_figs/Neonectria_frequency_by_duration_infection_and_climate_5K_min.pdf", width = 25, height = 8)
+pdf("prelim_figs/Neonectria_frequency_by_duration_infection_and_climate_5K_min.tree_sum.pdf", width = 25, height = 8)
 grid.arrange(p1,p7,p3,p9,p5,p2,p8,p4,p10,p6,nrow= 2)
 dev.off()
 
@@ -789,7 +768,7 @@ labs(y = "", x = "Mean tree condition (0-5)") +
 #scale_color_brewer(palette = "Dark2") +
 my_gg_theme
 
-pdf("prelim_figs/Neonectria_frequency_by_disease_severity_5K_min.pdf", width = 25, height = 8)
+pdf("prelim_figs/Neonectria_frequency_by_disease_severity_5K_min.tree_sum.pdf", width = 25, height = 8)
 grid.arrange(p1,p3,p5,p7,p9,p2,p4,p6,p8,p10,nrow= 2)
 dev.off()
 
@@ -797,20 +776,14 @@ dev.off()
 #Richness by duration_infection etc#
 
 sample_richness = data.frame(sample = names(apply(asv_tab.gt5K.rare,1,function(x) sum(x > 0))), richness =  apply(asv_tab.gt5K.rare,1,function(x) sum(x > 0)))
-sample_richness.metadata = left_join(sample_richness, id_bench_map) %>%
-left_join(., metadata_map)
-
-
-sample_richness.metadata.site_info = left_join(sample_richness.metadata, Nf_v_Nd.bin) %>%
-left_join(., site_info, by = "Site") %>%
-left_join(., site_climate) %>%
-left_join(., site_means, by = "Site")
+sample_richness.metadata = left_join(sample_richness, full_metadata)
+sample_richness.metadata.site_info = left_join(sample_richness.metadata, Nf_v_Nd.bin)
 
 sample_richness.metadata.site_info$Site = factor(sample_richness.metadata.site_info$Site, levels = c("MEN1", "MES1", "ADN1", "ADS1", "CW1", "TSP1", "GK1j", "ASH2", "MI1", "WF1"))
 
 #continental scale vars
 
-p1 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(Site, richness, group = Site, color = Site)) +
+p1 = ggplot(sample_richness.metadata.site_info, aes(Site, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "ASV richness\nper 5K sequences", x = "Site") +
@@ -820,7 +793,7 @@ guide = F
 my_gg_theme +
 scale_x_discrete(labels = c(rep("", 10)))
 
-p2 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(duration_infection, richness, group = Site, color = Site)) +
+p2 = ggplot(sample_richness.metadata.site_info, aes(duration_infection, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "ASV richness\nper 5K sequences", x = "Infection duration") +
@@ -829,7 +802,7 @@ guide = F
 ) +
 my_gg_theme
 
-p3 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(tmin, richness, group = Site, color = Site)) +
+p3 = ggplot(sample_richness.metadata.site_info, aes(tmin, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "Average minimum temperature") +
@@ -838,7 +811,7 @@ guide = F
 ) +
 my_gg_theme
 
-p4 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(MAT, richness, group = Site, color = Site)) +
+p4 = ggplot(sample_richness.metadata.site_info, aes(MAT, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "MAT") +
@@ -847,7 +820,7 @@ guide = F
 ) +
 my_gg_theme
 
-p5 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(tmax, richness, group = Site, color = Site)) +
+p5 = ggplot(sample_richness.metadata.site_info, aes(tmax, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "Average maximum temperature") +
@@ -855,7 +828,7 @@ scale_color_brewer(palette = "Paired", name = "Site", labels = c("ADS1" = "NY so
 ) +
 my_gg_theme
 
-p6 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(ppt, richness, group = Site, color = Site)) +
+p6 = ggplot(sample_richness.metadata.site_info, aes(ppt, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "Average annual precipitation") +
@@ -863,14 +836,14 @@ scale_color_brewer(palette = "Paired", name = "Site", labels = c("ADS1" = "NY so
 ) +
 my_gg_theme
 
-pdf("prelim_figs/ASV_richness_by_climate_5K_min.pdf", width = 24, height = 8)
+pdf("prelim_figs/ASV_richness_by_climate_5K_min.tree_sum.pdf", width = 24, height = 8)
 grid.arrange(p1,p3,p5,p2,p4,p6,nrow = 2, widths = c(0.31,0.31,0.38))
 dev.off()
 
 #site/diseaxe severity vars
 
 
-p1 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(Site_mean.dbh, richness, group = Site, color = Site)) +
+p1 = ggplot(sample_richness.metadata.site_info, aes(Site_mean.dbh, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "ASV richness\nper 5K sequences", x = "DBH") +
@@ -880,7 +853,7 @@ guide = F
 my_gg_theme +
 scale_x_discrete(labels = c(rep("", 10)))
 
-p2 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(Site_mean.NeoFruiting, richness, group = Site, color = Site)) +
+p2 = ggplot(sample_richness.metadata.site_info, aes(Site_mean.NeoFruiting, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "ASV richness\nper 5K sequences", x = "Mean neonectria fruiting (0-5)") +
@@ -889,7 +862,7 @@ guide = F
 ) +
 my_gg_theme
 
-p3 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(Site_mean.Wax, richness, group = Site, color = Site)) +
+p3 = ggplot(sample_richness.metadata.site_info, aes(Site_mean.Wax, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "Mean wax load (0-5)") +
@@ -898,7 +871,7 @@ guide = F
 ) +
 my_gg_theme
 
-p4 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(Site_mean.RaisedCanker, richness, group = Site, color = Site)) +
+p4 = ggplot(sample_richness.metadata.site_info, aes(Site_mean.RaisedCanker, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "Mean cankers") +
@@ -907,7 +880,7 @@ guide = F
 ) +
 my_gg_theme
 
-p5 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(Site_mean.TreeCond, richness, group = Site, color = Site)) +
+p5 = ggplot(sample_richness.metadata.site_info, aes(Site_mean.TreeCond, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "Meantree condition (0-5)") +
@@ -915,7 +888,7 @@ scale_color_brewer(palette = "Paired", name = "Site", labels = c("ADS1" = "NY so
 ) +
 my_gg_theme
 
-p6 = ggplot(sample_richness.metadata.site_info %>% filter(bench.control == "n"), aes(Site_mean.Xylococcus, richness, group = Site, color = Site)) +
+p6 = ggplot(sample_richness.metadata.site_info, aes(Site_mean.Xylococcus, richness, group = Site, color = Site)) +
 geom_boxplot() +
 #facet_wrap(~run.seq) +
 labs(y = "", x = "Mean Xylococcus") +
@@ -923,13 +896,13 @@ scale_color_brewer(palette = "Paired", name = "Site", labels = c("ADS1" = "NY so
 ) +
 my_gg_theme
 
-pdf("prelim_figs/ASV_richness_by_disease_severity_5K_min.pdf", width = 24, height = 8)
+pdf("prelim_figs/ASV_richness_by_disease_severity_5K_min.tree_sum.pdf", width = 24, height = 8)
 grid.arrange(p1,p3,p5,p2,p4,p6,nrow = 2, widths = c(0.31,0.31,0.38))
 dev.off()
 
 #Neo occurence
 
-pdf("prelim_figs/ASV_richness_by_neo_occurence_5K_min.pdf", width = 8, height = 4)
+pdf("prelim_figs/ASV_richness_by_neo_occurence_5K_min.tree_sum.pdf", width = 8, height = 4)
 ggplot(sample_richness.metadata.site_info , aes(occurence, richness)) +
 geom_boxplot(width = .25) +
 #facet_wrap(~run.seq) +

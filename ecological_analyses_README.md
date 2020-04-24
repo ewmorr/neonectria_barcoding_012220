@@ -58,11 +58,21 @@ Run NMDS, k = 3, singletons removed
 ```
 Rscript ~/repo/neonectria_barcoding_012220/sum_trees/run_and_save_NMDS.r
 ```
+Prelim figs
+```
+Rscript ~/repo/neonectria_barcoding_012220/sum_trees/prelim_figs_data_explore_sum_trees.r
+```
 GAM fits
 ```
 Rscript ~/repo/neonectria_barcoding_012220/sum_trees/GAM_fits_NMDS.r
 ```
 
+#### effects of number of plugs on richness and comm. comp.
+
+```
+mkdir n_plug_effects
+Rscript ~/repo/neonectria_barcoding_012220/sum_trees/n_plug_effects.r
+```
 
 
 ##### extract nectriaceae and/or neonectria ASV seqs and perform phylogenetic analyses
