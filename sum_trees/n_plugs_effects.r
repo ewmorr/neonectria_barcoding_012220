@@ -147,14 +147,46 @@ dev.off()
 
 p1 = ggplot(asv_tab.gt1K.rare.mds.metadata, aes(MDS1, MDS2, fill = as.factor(n_plugs))) +
 geom_point(size = 2.5, shape = 22, color = "black") +
-facet_wrap(~Site, scale = "free", ncol = 5) +
+facet_wrap(~Site, scale = "free", ncol = 4) +
 my_gg_theme +
 scale_fill_brewer(palette = "Dark2") +
 theme(legend.title = element_text(size = 17, hjust = 0), legend.text = element_text(size = 15)) +
 labs(fill = "no. plugs\nper tree")
+#The full NMDS provides similar qualitative groupings and is esier to see
+pdf("n_plug_effects/NMDS_within_site_plugs.pdf", width = 10, height = 6)
+print(p1)
+dev.off()
 
 
+#PERMANOVA
 
+adonis_list = vector("list")
 
+for(i in 1:10){
+    row_names = full_metadata %>% filter(Site == site_levels[i]) %>% select(sample)
+    temp_tab = asv_tab.gt1K.rare[rownames(asv_tab.gt1K.rare) %in% row_names$sample, ]
+    temp_tab = temp_tab[,colSums(temp_tab) > 0]
+    temp_meta = full_metadata %>% filter(sample %in% rownames(temp_tab)) %>% select(sample, n_plugs)
+    print(max(temp_meta$n_plugs))
+    if(max(temp_meta$n_plugs)>1){
+         rownames(temp_meta) = temp_meta$sample
+        temp_meta = temp_meta[match(rownames(temp_tab), rownames(temp_meta)),]
+        temp_adonis = adonis(log10(temp_tab +1) ~ temp_meta$n_plugs)
+        adonis_list[[site_levels[i]]] = temp_adonis
+    }
+}
 
+adonis_tab = data.frame(
+    Site = names(adonis_list),
+    R2 = vector(mode = "numeric", length = length(adonis_list)),
+    p.val = vector(mode = "numeric", length = length(adonis_list))
+)
 
+for(i in 1:length(adonis_list)){
+    site_nam = names(adonis_list)[i]
+    adonis_tab$Site[i] = names(adonis_list)[i]
+    adonis_tab$R2[i] = adonis_list[[site_nam]]$aov.tab$R2[1]
+    adonis_tab$p.val[i] = adonis_list[[site_nam]]$aov.tab$`Pr(>F)`[1]
+}
+
+write.table(adonis_tab, file = "n_plug_effects/within_site_adonis.txt", row.names = F, sep = "\t", quote = F)
