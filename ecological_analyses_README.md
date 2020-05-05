@@ -64,7 +64,9 @@ Rscript ~/repo/neonectria_barcoding_012220/sum_trees/prelim_figs_data_explore_su
 ```
 GAM fits
 ```
-Rscript ~/repo/neonectria_barcoding_012220/sum_trees/GAM_fits_NMDS.r
+Rscript ~/repo/neonectria_barcoding_012220/sum_trees/GAM_fits_NMDS.site_means_cov.tree_level_comm.r
+Rscript ~/repo/neonectria_barcoding_012220/sum_trees/GAM_fits_NMDS.tree_level_cov.tree_level_comm.r
+
 ```
 
 #### effects of number of plugs on richness and comm. comp.
