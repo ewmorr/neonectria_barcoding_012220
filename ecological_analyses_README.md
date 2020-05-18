@@ -76,5 +76,17 @@ mkdir n_plug_effects
 Rscript ~/repo/neonectria_barcoding_012220/sum_trees/n_plug_effects.r
 ```
 
+#### Site level comm comp for landscape/continental vars
+GAM fits on site level dat with community aggregated by site
+```
+Rscript ~/repo/neonectria_barcoding_012220/sum_trees/run_and_save_NMDS.site_sum.r
+Rscript ~/repo/neonectria_barcoding_012220/sum_trees/GAM_fits_NMDS.site_means_cov.site_agg_comm.r
+```
+Mantel correlogram
+```
+Rscript ~/repo/neonectria_barcoding_012220/sum_trees/mantel_correlog.r
+```
+
+
 
 ##### extract nectriaceae and/or neonectria ASV seqs and perform phylogenetic analyses
