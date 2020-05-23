@@ -7,13 +7,11 @@ require(hutilscpp)
 #install_github(repo = "ropensci/prism")
 require(prism)
 
-prism_set_dl_dir("/Users/ericmorrison/PRISM_data")
+prism_set_dl_dir("/Users/ericmorrison/PRISM_dailys_neonectria_sampling")
 #options(prism.path = "/Users/ericmorrison/PRISM_data")
-get_prism_normals(type = 'ppt', resolution = '4km', annual = T, keepZip = TRUE)
-get_prism_normals(type = 'tmean', resolution = '4km', annual = T, keepZip = TRUE)
-get_prism_normals(type = 'tmax', resolution = '4km', annual = T, keepZip = TRUE)
-get_prism_normals(type = 'tmin', resolution = '4km', annual = T, keepZip = TRUE)
-
+get_prism_dailys(type = "tmin", minDate="2007-01-01", maxDate="2018-12-31", keepZip = TRUE)
+get_prism_dailys(type = "tmax", minDate="2007-01-01", maxDate="2018-12-31", keepZip = TRUE)
+get_prism_dailys(type = "ppt", minDate="2007-01-01", maxDate="2018-12-31", keepZip = TRUE)
 
 site_coords = read.table("sample_data/site_coords.txt", header = T)
 sites_climate = site_coords
