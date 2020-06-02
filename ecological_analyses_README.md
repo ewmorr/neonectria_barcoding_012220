@@ -11,6 +11,12 @@ Make table of site-wide averages for ancillary data
 Rscript ~/repo/neonectria_barcoding_012220/ecol/site_averages_on_transects_data.r
 Rscript ~/repo/neonectria_barcoding_012220/PRISM_analysis/sites_climate_dat.r
 ```
+Calculate GDD based seasonal metrics using PRISM daily data. Some of the commands in the script for downloading dailys are hard-c-ded and should be checked before running.
+```
+Rscript ~/repo/neonectria_barcoding_012220/PRISM_analysis/tmin_tmax_dailys_site_extract.r
+Rscript ~/repo/neonectria_barcoding_012220/PRISM_analysis/tmin_tmax_dailys_GDD_calcs.r
+Rscript ~/repo/neonectria_barcoding_012220/PRISM_analysis/long-term_and_short-term_GDD_avgs.r
+```
 Pairwise comps of site dat
 ```
 Rscript ~/repo/neonectria_barcoding_012220/ecol/pairwise_comps_site_dat.r
@@ -66,9 +72,11 @@ GAM fits
 ```
 Rscript ~/repo/neonectria_barcoding_012220/sum_trees/GAM_fits_NMDS.site_means_cov.tree_level_comm.r
 Rscript ~/repo/neonectria_barcoding_012220/sum_trees/GAM_fits_NMDS.tree_level_cov.tree_level_comm.r
-
 ```
-
+Added GAM fits for PRISM daily GDD calcs
+```
+Rscript ~/repo/neonectria_barcoding_012220/sum_trees/GAM_fits_NMDS.site_GDDclim_cov.tree_level_comm.r
+```
 #### effects of number of plugs on richness and comm. comp.
 
 ```
@@ -84,7 +92,7 @@ Rscript ~/repo/neonectria_barcoding_012220/sum_trees/GAM_fits_NMDS.site_means_co
 ```
 Mantel correlogram
 ```
-Rscript ~/repo/neonectria_barcoding_012220/sum_trees/mantel_correlog.r
+Rscript ~/repo/neonectria_barcoding_012220/sum_trees/mantel_correlog.site_sum.r
 ```
 
 

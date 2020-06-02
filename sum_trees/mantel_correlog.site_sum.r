@@ -82,19 +82,3 @@ pdf("prelim_figs/mantel_correlogram.sites.pdf", width = 8, height = 4)
 print(p1)
 dev.off()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
