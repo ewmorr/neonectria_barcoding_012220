@@ -3,7 +3,7 @@ require(reshape2)
 require(dplyr)
 require(raster)
 
-install_github(repo = "ropensci/prism")
+#install_github(repo = "ropensci/prism")
 require(prism)
 
 prism_set_dl_dir("/Users/ericmorrison/PRISM_data")
@@ -56,3 +56,27 @@ plot_width = (maxLon-minLon)/2
 pdf("PRISM_maps/site_MAT_map.pdf", height = plot_height, width = plot_width)
 print(p1)
 dev.off()
+
+#big text
+
+p1 = ggplot()+
+geom_raster(data=m.df.study_area, aes(x=lon, y=lat, fill=ppt))+
+geom_point(data=site_coords, aes(x=lon, y = lat), color = "black", size = 5) +
+my_gg_theme +
+labs(y = NULL, x = NULL) +
+theme(
+legend.title = element_text(size = 35),
+legend.text = element_text(size = 30),
+axis.text = element_blank(),
+axis.ticks = element_blank(),
+legend.position = c(0.825,0.225)
+) +
+scale_fill_gradient2(expression("MAT ("*degree*C*")"), low='darkslateblue',mid='lightblue',high = 'red',midpoint=10)
+
+plot_height = (maxLat-minLat)/2
+plot_width = (maxLon-minLon)/2
+
+pdf("PRISM_maps/site_MAT_map.big_text.pdf", height = plot_height, width = plot_width)
+print(p1)
+dev.off()
+

@@ -144,17 +144,17 @@ data.frame(sample = colnames(asv_tab), total_seqs = colSums(asv_tab))
 Nf_Nd.asv_mapping_comp$Neo_avg = (Nf_Nd.asv_mapping_comp$Neonectria_count.asv + Nf_Nd.asv_mapping_comp$Neonectria_count.mapping) / 2
 
 #remake count vectors
-Nf_counts = as.vector((filter(Nf_Nd.asv_mapping_comp, spp == "Nf") %>% select(Neo_avg))[[1]] )
-names(Nf_counts) = (filter(Nf_Nd.asv_mapping_comp, spp == "Nf") %>% select(sample))[[1]]
+Nf_counts = as.vector((filter(Nf_Nd.asv_mapping_comp, spp == "Nf") %>% dplyr::select(Neo_avg))[[1]] )
+names(Nf_counts) = (filter(Nf_Nd.asv_mapping_comp, spp == "Nf") %>% dplyr::select(sample))[[1]]
 
-Nd_counts = as.vector((filter(Nf_Nd.asv_mapping_comp, spp == "Nd") %>% select(Neo_avg))[[1]] )
-names(Nd_counts) = (filter(Nf_Nd.asv_mapping_comp, spp == "Nd") %>% select(sample))[[1]]
+Nd_counts = as.vector((filter(Nf_Nd.asv_mapping_comp, spp == "Nd") %>% dplyr::select(Neo_avg))[[1]] )
+names(Nd_counts) = (filter(Nf_Nd.asv_mapping_comp, spp == "Nd") %>% dplyr::select(sample))[[1]]
 
 #############
 #SUM by tree#
 #############
 
-site_tree_label = full_metadata %>% filter(bench.control == "n" & locus == "ITS2") %>% select(c("Site", "Tree", "metadata.label"))
+site_tree_label = full_metadata %>% filter(bench.control == "n" & locus == "ITS2") %>% dplyr::select(c("Site", "Tree", "metadata.label"))
 site_tree_label$Site.tree = interaction(site_tree_label$Site, site_tree_label$Tree)
 
 #########################
@@ -229,8 +229,8 @@ full_metadata.site_tree = full_metadata %>% filter(bench.control == "n" & locus 
 full_metadata.site_tree$sample = paste(as.character(full_metadata.site_tree$Site), as.character(full_metadata.site_tree$Tree), sep = ".")
 
 #add number of plugs sampled per tree
-plugs_per_sample = full_metadata.site_tree %>% group_by(sample) %>% select(sample, Plug) %>% summarize(n_plugs = n())
-full_metadata.site_tree = full_metadata.site_tree %>% select(-Plug, -metadata.label, -bench.control, -locus, -Pool, -Site_tree_plug, -NeoCoverage, -cambium, -phloem.depth)
+plugs_per_sample = full_metadata.site_tree %>% group_by(sample) %>% dplyr::select(sample, Plug) %>% summarize(n_plugs = n())
+full_metadata.site_tree = full_metadata.site_tree %>% dplyr::select(-Plug, -metadata.label, -bench.control, -locus, -Pool, -Site_tree_plug, -NeoCoverage, -cambium, -phloem.depth)
 full_metadata.site_tree = left_join(full_metadata.site_tree %>% distinct, plugs_per_sample, by = "sample")
 
 #then add metadata to dfs
@@ -251,7 +251,7 @@ asv_tab = asv_tab[rowSums(asv_tab) > 1,]
 #SUM ASV counts by tree#
 ########################
 
-site_tree_label = full_metadata %>% filter(bench.control == "n" & locus == "ITS2") %>% select(c("Site", "Tree", "metadata.label"))
+site_tree_label = full_metadata %>% filter(bench.control == "n" & locus == "ITS2") %>% dplyr::select(c("Site", "Tree", "metadata.label"))
 
 site_tree_label$Site.tree = interaction(site_tree_label$Site, site_tree_label$Tree)
 
