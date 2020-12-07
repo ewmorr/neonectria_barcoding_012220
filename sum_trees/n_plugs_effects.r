@@ -62,7 +62,7 @@ pdf("n_plug_effects/full_NMDS_n_plugs.1K.pdf", width = 8, height = 6)
 print(p1)
 dev.off()
 
-n_plugs.adonis.1K = adonis(log10(asv_tab.gt1K.rare+1) ~ full_metadata.1K$n_plugs)
+n_plugs.adonis.1K = adonis(log10(asv_tab.gt1K.rare+1) ~ full_metadata.1K$Site * full_metadata.1K$n_plugs)
 n_plugs.adonis.bin.1K = adonis(asv_tab.gt1K.rare ~ full_metadata.1K$n_plugs, binary = T)
 
 #####################
@@ -75,7 +75,9 @@ sample_rarefied_richness.metadata = left_join(
     by = "sample"
 )
 
-summary(aov(richness ~ as.factor(n_plugs), data = sample_rarefied_richness.metadata))
+summary(aov(richness ~ n_plugs*Site, data = sample_rarefied_richness.metadata))
+
+anova(lm(richness ~ n_plugs*Site, data = sample_rarefied_richness.metadata))
 
 p1 = ggplot(sample_rarefied_richness.metadata, aes(as.factor(n_plugs), richness)) +
 geom_boxplot(outlier.size = 3) +

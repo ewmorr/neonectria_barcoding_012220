@@ -1,6 +1,7 @@
 library(ggplot2)
 library(tidyverse)
 library(maps)
+require(scatterpie)
 
 source("~/ggplot_theme.txt")
 
@@ -66,6 +67,26 @@ full_metadata,
 by = "sample"
 )
 
+##############################
+#Calculate Nf and Nd frequency as individual columns (i.e., no "both")
+
+Nf_Nd_site_freq.spp = data.frame(
+Site = vector(mode = "character", length = length(site_info$Site)),
+N.faginata = vector(mode = "numeric", length = length(site_info$Site)),
+N.ditissima = vector(mode = "numeric", length = length(site_info$Site)),
+stringsAsFactors = FALSE
+)
+
+for( i in 1:length(site_info$Site)){
+    temp_tab = full_metadata.sorted %>% filter(Site == site_info$Site[i])
+    Nf_Nd_site_freq.spp$N.faginata[i] = ((filter(temp_tab, occurence == "Nf" | occurence == "both")) %>% nrow)/nrow(temp_tab)
+    Nf_Nd_site_freq.spp$N.ditissima[i] = ((filter(temp_tab, occurence == "Nd" | occurence == "both")) %>% nrow)/nrow(temp_tab)
+    Nf_Nd_site_freq.spp$Site[i] = as.character(site_info$Site[i])
+}
+
+###############################
+
+
 
 Nf_Nd_site_freq = data.frame(
 Site = vector(mode = "character", length = length(site_info$Site)),
@@ -100,7 +121,7 @@ geom_polygon(
     aes(x = long, y = lat, group = group),
     fill = "light grey", color = "black"
 ) +
-coord_fixed(1.3) +
+coord_fixed(1.0) +
 geom_scatterpie(
     data = Nf_Nd_site_freq.metadata,
     aes(x = lon, y = lat),
@@ -108,8 +129,9 @@ geom_scatterpie(
     cols = c("both", "N.faginata", "N.ditissima", "neither")
 ) +
 scale_fill_manual(
-    values = cbPalette[4:1],
-    labels = c("both" = "both spp.", "N.faginata" = "N.faginata", "N.ditissima" = "N.ditissima", "neither" = "neither spp.")
+    values = c("both" = "black", "N.faginata" = "grey42", "N.ditissima" = "grey72", "neither" = "white"),
+    labels = c("both" = "both spp.", "N.faginata" = "N.faginata", "N.ditissima" = "N.ditissima", "neither" = "neither spp."),
+    breaks = c("both", "N.faginata", "N.ditissima", "neither")
 ) +
 labs(
 x = NULL,

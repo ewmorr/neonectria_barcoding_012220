@@ -52,8 +52,6 @@ for(i in levels_of){
     
 }
 
-restcomb = c(1,2,3,4,5,6,7,)
-
 #vars to use from full_metadata.sorted
 #duration_infection NeoFruiting RaisedCanker  Wax Xylococcus TreeCond quartile occurence
 
@@ -63,28 +61,56 @@ summary(neo_fruit, indvalcom = T)
 
 
 #In order to set restcomb to an ecologically meaningful grouping can first extract the different combinations of levels from $comb of the multipatt object
-#The indies of this vector will then be the indices of the groups to look at (pick as desired)
+#The indices of this vector will then be the indices of the groups to look at (pick as desired)
+#With ordinal variable sensible combinations include consecutive groupings
+#0, 1, 2, 3, 4, 5, 0+1, 0+1+2, 2+3+4+5, 3+4+5, 4+5
 possible_groupings = colnames(neo_fruit$comb)
 
+restcomb = c(1,2,3,4,5,6,7, 22, 56, 41, 21)
+
+neo_fruit = multipatt(asv_tab.gt1K.rare.bin, cluster = full_metadata.sorted$NeoFruiting, duleg = F, restcomb = restcomb)
+summary(neo_fruit)
+
+
 RaisedCanker = multipatt(asv_tab.gt1K.rare.bin, cluster = full_metadata.sorted$RaisedCanker, duleg = F)
+possible_groupings = colnames(RaisedCanker$comb)
+#0, 1, 2, 3,0+1, 1+2+3,2+3
+restcomb = c(1,2,3,4,5, 14,10)
+
+RaisedCanker = multipatt(asv_tab.gt1K.rare.bin, cluster = full_metadata.sorted$RaisedCanker, duleg = F, restcomb = restcomb)
 summary(RaisedCanker)
 
 Wax = multipatt(asv_tab.gt1K.rare.bin, cluster = full_metadata.sorted$Wax, duleg = F)
+possible_groupings = colnames(Wax$comb)
+#0, 1, 2, 3, 4, 5, 0+1, 0+1+2, 2+3+4+5, 3+4+5, 4+5
+restcomb = c(1,2,3,4,5,6,7, 22, 56, 41, 21)
+Wax = multipatt(asv_tab.gt1K.rare.bin, cluster = full_metadata.sorted$Wax, duleg = F, restcomb = restcomb)
 summary(Wax)
 
 Xylococcus = multipatt(asv_tab.gt1K.rare.bin, cluster = full_metadata.sorted$Xylococcus, duleg = F)
+possible_groupings = colnames(Xylococcus$comb)
+#0,1,2,0+1,1+2
+restcomb = c(1,2,3,4,6)
+Xylococcus = multipatt(asv_tab.gt1K.rare.bin, cluster = full_metadata.sorted$Xylococcus, duleg = F, restcomb = restcomb)
 summary(Xylococcus)
 
 TreeCond = multipatt(asv_tab.gt1K.rare.bin, cluster = full_metadata.sorted$TreeCond, duleg = F)
-summary(TreeCond)
-
-TreeCond = multipatt(asv_tab.gt1K.rare.bin, cluster = full_metadata.sorted$TreeCond, duleg = F)
+possible_groupings = colnames(TreeCond$comb)
+#0,1,2,3, 0+1, 1+2+3, 2+3
+restcomb = c(1,2,3,4,5,14, 10)
+TreeCond = multipatt(asv_tab.gt1K.rare.bin, cluster = full_metadata.sorted$TreeCond, duleg = F, restcomb = restcomb)
 summary(TreeCond)
 
 quartile = multipatt(asv_tab.gt1K.rare.bin, cluster = full_metadata.sorted$quartile, duleg = F)
+possible_groupings = colnames(quartile$comb)
+#lower, inter, upper, inter+lower, inter+upper
+restcomb = c(1,2,3,4,5)
+quartile = multipatt(asv_tab.gt1K.rare.bin, cluster = full_metadata.sorted$quartile, duleg = F, restcomb = restcomb)
 summary(quartile)
 
 occurrence = multipatt(asv_tab.gt1K.rare.bin, cluster = full_metadata.sorted$occurence, duleg = T)
+possible_groupings = colnames(occurrence$comb)
+#all
 summary(occurrence)
 
 Nf = multipatt(asv_tab.gt1K.rare.bin, cluster = full_metadata.sorted$Nf, duleg = T)
@@ -100,17 +126,12 @@ asv_tax[rownames(asv_tax) == "ASV_29", ]
 
 
 
+######################################################
+#Write sig tables to parse sig spp associations for multiple category ASVs
 
-
-
-
-
-
-
-
-
-
-
-
-
+write.table(neo_fruit$sign, "ISA_spp_tables/neo_fruit.txt", quote = F, sep = "\t", row.names = T)
+write.table(RaisedCanker$sign, "ISA_spp_tables/RaisedCanker.txt", quote = F, sep = "\t", row.names = T)
+write.table(Wax$sign, "ISA_spp_tables/Wax.txt", quote = F, sep = "\t", row.names = T)
+write.table(TreeCond$sign, "ISA_spp_tables/TreeCond.txt", quote = F, sep = "\t", row.names = T)
+write.table(occurrence$sign, "ISA_spp_tables/occurrence.txt", quote = F, sep = "\t", row.names = T)
 
