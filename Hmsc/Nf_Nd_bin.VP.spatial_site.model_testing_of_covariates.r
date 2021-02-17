@@ -253,7 +253,10 @@ scale_color_manual(values = c("P<0.05" = "black", "n.s." = "white")) +
 guides(color = guide_legend(override.aes = list(fill = "grey"))) +
 scale_size_continuous(range= c(5,25), breaks = c(0,0.05,0.15), limits = c(0,0.2))+
 my_gg_theme +
-guides(color = guide_legend(override.aes = list(size = 5, shape = 21, fill = "dark grey"))) +
+guides(
+    color = guide_legend(override.aes = list(size = 5, shape = 21, fill = "dark grey")),
+    size = guide_legend(override.aes = list(shape = 16, color = "dark grey"))
+) +
 labs(
 x = "",
 y = "",
@@ -264,13 +267,15 @@ fill = "Slope"
 ) +
 theme(
 legend.title = element_text(size = 20),
-axis.text = element_text(size = 18)
+axis.text = element_text(size = 18),
+legend.key = element_rect(fill = "white")
 )
 
-pdf("HMSC/Nf_Nd_variance_partitioning.bin.spatial.mod.pdf", width = 8.5, height = 6)
+pdf("HMSC/Nf_Nd_variance_partitioning.bin.spatial.mod.pdf", width = 8.5, height = 8)
 p1
 dev.off()
 
+write.table(VP.vals.support, "Nf_Nd_variance_partitioning.bin.spatial.VP_table.txt", row.names = F, sep = "\t", quote = F)
 #scale_fill_continuous(limits = c(-1,1))
 
 ####################

@@ -20,6 +20,7 @@ by = "sample"
 
 full_metadata.sorted$occurence = factor(full_metadata.sorted$occurence, levels = c("none", "Nf", "Nd", "both"))
 
+
 tree_cond_table = full_metadata.sorted %>% group_by(TreeCond, occurence) %>% summarize(n = n())
 cankers_table = full_metadata.sorted %>% group_by(RaisedCanker, occurence) %>% summarize(n = n())
 
@@ -28,9 +29,58 @@ summary(aov(n ~ RaisedCanker, cankers_table %>% filter(occurence == "none")))
 summary(aov(n ~ RaisedCanker, cankers_table %>% filter(occurence == "both")))
 summary(aov(n ~ TreeCond, tree_cond_table %>% filter(occurence == "both")))
 
+
+#######################################
+#Offset bars (Jeff's suggested layout)#
+#######################################
+full_metadata.sorted$NfNd.sum = full_metadata.sorted[,"Nf"] + full_metadata.sorted[,"Nd"]
+
+for(i in 1:nrow(full_metadata.sorted)){
+    if(full_metadata.sorted$NfNd.sum[i] == 1 & full_metadata.sorted$Nd[i] == 1){
+        full_metadata.sorted$NfNd.sum[i] = 0.5
+    }
+}
+
+
+tree_cond.presAbs = full_metadata.sorted %>%
+select(c("Nf", "Nd", "Site", "sample", "TreeCond", "NfNd.sum")) %>%
+pivot_longer(c(-Site, -sample, -TreeCond, -NfNd.sum))
+
+
+ggplot(tree_cond.presAbs %>% filter(value != 0 & Site == "WF1"), aes(x = as.factor(sample), y = name, group = name, color = name)) +
+geom_segment(size = 5) +
+scale_y_discrete(expand = c(0, 1), breaks = NULL) +
+#xlim(
+coord_polar() +
+my_gg_theme
+
+ggplot(tree_cond.presAbs %>% filter(Site == "WF1"), aes(x = reorder(as.factor(sample), NfNd.sum), y = name, group = name, fill = as.factor(value))) +
+geom_tile(color = "black") +
+scale_y_discrete(expand = c(0, 1), breaks = NULL) +
+#xlim(
+coord_polar() +
+scale_fill_manual(values = c("white", "black"), labels = c("absent", "present")) +
+my_gg_theme +
+theme(
+axis.text.x = element_blank()
+)
+
+ggplot(ml[value != 0], aes(x = fct_month, y = variable, group = variable, color = variable)) +
+geom_line(size = 5) +
+scale_y_discrete(expand = c(0, 1), breaks = NULL) +
+my_gg_theme
+
+ggplot(ml[value != 0], aes(x = fct_month, y = variable,
+group = variable, colour = variable)) +
+geom_line(size = 5) +
+scale_y_discrete(expand = c(0, 1), breaks = NULL) +
+#xlim(month.abb) +
+coord_polar() +
+theme_bw() + xlab(NULL) + ylab(NULL)
+
 p1 = ggplot(full_metadata.sorted, aes(x = TreeCond, fill = occurence)) +
 #geom_bar(position = position_dodge(width = 0.9), color = "black") +
-geom_bar(position = "fill", color = "black") +
+geom_bar(color = "black") +
 scale_fill_manual(
     values = c("both" = "black", "Nf" = "grey42", "Nd" = "grey72", "none" = "white"),
     labels = c("both" = "both spp.", "Nf" = "N.faginata", "Nd" = "N.ditissima", "none" = "neither spp."),
@@ -45,7 +95,7 @@ plot.title = element_text(hjust = -0.175)
 
 p4 = ggplot(full_metadata.sorted, aes(x = RaisedCanker, fill = occurence)) +
 #geom_bar(position = position_dodge(width = 0.9), color = "black") +
-geom_bar(position = "fill", color = "black") +
+geom_bar(color = "black") +
 scale_fill_manual(
 values = c("both" = "black", "Nf" = "grey42", "Nd" = "grey72", "none" = "white"),
 labels = c("both" = "both spp.", "Nf" = "N.faginata", "Nd" = "N.ditissima", "none" = "neither spp."),

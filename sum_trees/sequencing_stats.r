@@ -51,7 +51,7 @@ full_meatadata.sorted = left_join(
 ) %>% left_join(., Nf_v_Nd.bin)
 
 full_meatadata.sorted = left_join(full_meatadata.sorted, richness_rarefied)
-summarized_richness = full_meatadata.sorted %>% group_by(Site) %>% summarize(mean = mean(richness_rarefied), sd = sd(richness_rarefied))
+summarized_richness = full_meatadata.sorted %>% group_by(Site) %>% summarize(mean = mean(richness_rarefied), sd = sd(richness_rarefied), sum = sum(richness_rarefied))
 full_meatadata.sorted$summarized_richness %>% median
 
 

@@ -30,7 +30,16 @@ site_means = sites_climate.seasonal_summaries %>%
         ppt.sd = sd(ppt.sum),
         length.mean = mean(length),
         length.sd = sd(length)
+    )
+
+site_means.doy_start_end = sites_climate.seasonal_summaries %>%
+filter(year_sampled %in% seq(2009, 2018) & season == "growing") %>%
+group_by(Site) %>%
+summarize(
+doy.grow_start.mean = mean(doy.grow_start),
+doy.grow_end.mean = mean(doy.grow_end)
 )
+
 
 site_info.seasonal_summaries = left_join(site_info.seasonal_summaries, site_means, by = c("Site", "season"))
 #pivot_wider for one row per site

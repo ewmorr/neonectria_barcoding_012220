@@ -2,7 +2,7 @@ require(tidyverse)
 require(vegan)
 require(gridExtra)
 require(RColorBrewer)
-
+set.seed(6)
 source("~/ggplot_theme.txt")
 
 #read data
@@ -93,30 +93,41 @@ for(i in 1:nrow(asv_adonis_coefs.incidence)){
 summary(lm(R2 ~ freq, data = asv_adonis_coefs.incidence))
 
 #plot
-p1 = ggplot(asv_adonis_coefs.incidence, aes(freq, R2, fill = color, size = color)) +
+p2 = ggplot(asv_adonis_coefs.incidence, aes(freq, R2, fill = color, size = color)) +
 geom_point(alpha = 0.75, shape = 21) +
 geom_smooth(method = "lm", se = F, color = "black", linetype = 2) +
-annotate(geom = "text", label = expression(paste("R"^2, "= 0.165, P = 0.001")), x = 0.5, y = 0.12, size = 6) +
-labs(x = "frequency", y = expression(paste("adnois R"^2))) +
-scale_fill_manual(values = c("other spp." = "black", "N.ditissima" = "light grey", "N.faginata" = "grey54"), guide = F) +
+annotate(geom = "text", label = expression(paste("R"^2, "= 0.165, P = 0.001")), x = 0.35, y = 0.12, size = 6) +
+labs(x = "sample incidence", y = expression(paste("adnois R"^2)), title = "B") +
+scale_fill_manual(
+    values = c("other spp." = "black", "N.ditissima" = "light grey", "N.faginata" = "grey54"),
+    labels = c("other spp." = "other spp.", "N.ditissima" = expression(italic("N.ditissima")), "N.faginata" = expression(italic("N.faginata")))
+) +
 scale_size_manual(values = c("other spp." = 2, "N.ditissima" = 4, "N.faginata" = 4), guide = F) +
 scale_y_continuous(breaks = c(0,0.05,0.1)) +
-my_gg_theme
+guides(fill = guide_legend(override.aes = list(shape = 22, size = 7.5, linetype = 0))) +
+my_gg_theme +
+theme(
+axis.text.x = element_blank(),
+axis.title.y = element_blank(),
+plot.title = element_text(hjust = -0.12)
+)
 
-p2 = ggplot(asv_adonis_coefs.incidence, aes(reorder(ASV, -R2), R2, fill = color)) +
+
+p1 = ggplot(asv_adonis_coefs.incidence, aes(reorder(ASV, -R2), R2, fill = color)) +
 geom_bar(stat = "identity",color = "black") +
-labs(x = "rank", y = expression(paste("adnois R"^2))) +
-scale_fill_manual(values = c("other spp." = "grey24", "N.ditissima" = "light grey", "N.faginata" = "grey54")) +
+labs(x = "rank", y = expression(paste("adnois R"^2)), title = "A") +
+scale_fill_manual(values = c("other spp." = "grey24", "N.ditissima" = "light grey", "N.faginata" = "grey54"), guide = F) +
 scale_y_continuous(breaks = c(0,0.05,0.1)) +
 my_gg_theme +
 theme(
-axis.text.x = element_blank()
+axis.text.x = element_blank(),
+plot.title = element_text(hjust = -0.175)
 )
 
 require(gridExtra)
 
-pdf("prelim_figs/adonis_rank.pdf", width = 16, height = 6)
-grid.arrange(p1,p2,ncol = 2, widths = c(0.4,0.6))
+pdf("prelim_figs/adonis_rank.pdf", width = 12, height = 4)
+grid.arrange(p1,p2,ncol = 2, widths = c(0.5,0.5))
 dev.off()
 
 asv_adonis_coefs.incidence[order(asv_adonis_coefs.incidence$R2),]
@@ -125,4 +136,5 @@ top_asvs = c("ASV_12", "ASV_10", "ASV_27", "ASV_5", "ASV_1")
 
 asv_tax[top_asvs,]
 
+write.table(asv_adonis_coefs.incidence, "adonis_rank.txt", row.names = F, col.names = T, sep = "\t", quote = F)
 

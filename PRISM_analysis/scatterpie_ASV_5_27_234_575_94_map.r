@@ -1010,3 +1010,219 @@ pdf("PRISM_maps/ASV_217_occurence_in_sites.pdf", width = 8, height = 6)
 p
 dev.off()
 
+###############
+#ASV_119
+###############
+
+#########################
+#Get ASV_119 occurence
+
+asv_tab.gt1K.ASV_119 = t(asv_tab["ASV_119",!colnames(asv_tab) %in% lt_1K_samps$sample])
+
+asv_tab.gt1K.ASV_119[asv_tab.gt1K.ASV_119 > 0] = 1
+#Species matrix on Nf and Nd occurence
+
+full_metadata.sorted.ASV_119 = left_join(
+data.frame(sample = rownames(asv_tab.gt1K.ASV_119), asv_tab.gt1K.ASV_119),
+full_metadata,
+by = "sample"
+)
+
+
+ASV_119_site_freq = data.frame(
+Site = vector(mode = "character", length = length(site_info$Site)),
+absent = vector(mode = "numeric", length = length(site_info$Site)),
+present = vector(mode = "numeric", length = length(site_info$Site)),
+stringsAsFactors = FALSE
+)
+
+for( i in 1:length(site_info$Site)){
+    temp_tab = full_metadata.sorted.ASV_119 %>% filter(Site == site_info$Site[i])
+    ASV_119_site_freq$absent[i] = ((filter(temp_tab, ASV_119 == 0)) %>% nrow)/nrow(temp_tab)
+    ASV_119_site_freq$present[i] = ((filter(temp_tab, ASV_119 == 1)) %>% nrow)/nrow(temp_tab)
+    ASV_119_site_freq$Site[i] = as.character(site_info$Site[i])
+}
+
+ASV_119_site_freq.metadata = left_join(
+ASV_119_site_freq,
+site_info %>% select(Site, lat, lon)
+)
+
+
+######################
+#Plot piecharts on map
+
+p = ggplot() +
+geom_polygon(
+data = states.study_area,
+aes(x = long, y = lat, group = group),
+fill = "light grey", color = "black"
+) +
+coord_fixed(1.0) +
+geom_scatterpie(
+data = ASV_119_site_freq.metadata,
+aes(x = lon, y = lat),
+pie_scale = 2.5,
+cols = c("present", "absent")
+) +
+scale_fill_manual(
+values = c("absent" = "white", "present" = "dark grey")
+) +
+labs(
+x = NULL,
+y = NULL,
+fill = "ASV_119 detected\n(proportion trees)"
+)+
+my_gg_theme +
+theme(
+legend.title = element_text(size = 20),
+axis.text = element_blank(),
+axis.ticks = element_blank()
+)
+
+pdf("PRISM_maps/ASV_119_occurence_in_sites.pdf", width = 8, height = 6)
+p
+dev.off()
+
+
+#########################
+#Get ASV_212 occurence
+
+asv_tab.gt1K.ASV_212 = t(asv_tab["ASV_212",!colnames(asv_tab) %in% lt_1K_samps$sample])
+
+asv_tab.gt1K.ASV_212[asv_tab.gt1K.ASV_212 > 0] = 1
+#Species matrix on Nf and Nd occurence
+
+full_metadata.sorted.ASV_212 = left_join(
+data.frame(sample = rownames(asv_tab.gt1K.ASV_212), asv_tab.gt1K.ASV_212),
+full_metadata,
+by = "sample"
+)
+
+
+ASV_212_site_freq = data.frame(
+Site = vector(mode = "character", length = length(site_info$Site)),
+absent = vector(mode = "numeric", length = length(site_info$Site)),
+present = vector(mode = "numeric", length = length(site_info$Site)),
+stringsAsFactors = FALSE
+)
+
+for( i in 1:length(site_info$Site)){
+    temp_tab = full_metadata.sorted.ASV_212 %>% filter(Site == site_info$Site[i])
+    ASV_212_site_freq$absent[i] = ((filter(temp_tab, ASV_212 == 0)) %>% nrow)/nrow(temp_tab)
+    ASV_212_site_freq$present[i] = ((filter(temp_tab, ASV_212 == 1)) %>% nrow)/nrow(temp_tab)
+    ASV_212_site_freq$Site[i] = as.character(site_info$Site[i])
+}
+
+ASV_212_site_freq.metadata = left_join(
+ASV_212_site_freq,
+site_info %>% select(Site, lat, lon)
+)
+
+
+######################
+#Plot piecharts on map
+
+p = ggplot() +
+geom_polygon(
+data = states.study_area,
+aes(x = long, y = lat, group = group),
+fill = "light grey", color = "black"
+) +
+coord_fixed(1.0) +
+geom_scatterpie(
+data = ASV_212_site_freq.metadata,
+aes(x = lon, y = lat),
+pie_scale = 2.5,
+cols = c("present", "absent")
+) +
+scale_fill_manual(
+values = c("absent" = "white", "present" = "dark grey")
+) +
+labs(
+x = NULL,
+y = NULL,
+fill = "ASV_212 detected\n(proportion trees)"
+)+
+my_gg_theme +
+theme(
+legend.title = element_text(size = 20),
+axis.text = element_blank(),
+axis.ticks = element_blank()
+)
+
+pdf("PRISM_maps/ASV_212_occurence_in_sites.pdf", width = 8, height = 6)
+p
+dev.off()
+
+
+#########################
+#Get ASV_136 occurence
+
+asv_tab.gt1K.ASV_136 = t(asv_tab["ASV_136",!colnames(asv_tab) %in% lt_1K_samps$sample])
+
+asv_tab.gt1K.ASV_136[asv_tab.gt1K.ASV_136 > 0] = 1
+#Species matrix on Nf and Nd occurence
+
+full_metadata.sorted.ASV_136 = left_join(
+data.frame(sample = rownames(asv_tab.gt1K.ASV_136), asv_tab.gt1K.ASV_136),
+full_metadata,
+by = "sample"
+)
+
+
+ASV_136_site_freq = data.frame(
+Site = vector(mode = "character", length = length(site_info$Site)),
+absent = vector(mode = "numeric", length = length(site_info$Site)),
+present = vector(mode = "numeric", length = length(site_info$Site)),
+stringsAsFactors = FALSE
+)
+
+for( i in 1:length(site_info$Site)){
+    temp_tab = full_metadata.sorted.ASV_136 %>% filter(Site == site_info$Site[i])
+    ASV_136_site_freq$absent[i] = ((filter(temp_tab, ASV_136 == 0)) %>% nrow)/nrow(temp_tab)
+    ASV_136_site_freq$present[i] = ((filter(temp_tab, ASV_136 == 1)) %>% nrow)/nrow(temp_tab)
+    ASV_136_site_freq$Site[i] = as.character(site_info$Site[i])
+}
+
+ASV_136_site_freq.metadata = left_join(
+ASV_136_site_freq,
+site_info %>% select(Site, lat, lon)
+)
+
+
+######################
+#Plot piecharts on map
+
+p = ggplot() +
+geom_polygon(
+data = states.study_area,
+aes(x = long, y = lat, group = group),
+fill = "light grey", color = "black"
+) +
+coord_fixed(1.0) +
+geom_scatterpie(
+data = ASV_136_site_freq.metadata,
+aes(x = lon, y = lat),
+pie_scale = 2.5,
+cols = c("present", "absent")
+) +
+scale_fill_manual(
+values = c("absent" = "white", "present" = "dark grey")
+) +
+labs(
+x = NULL,
+y = NULL,
+fill = "ASV_136 detected\n(proportion trees)"
+)+
+my_gg_theme +
+theme(
+legend.title = element_text(size = 20),
+axis.text = element_blank(),
+axis.ticks = element_blank()
+)
+
+pdf("PRISM_maps/ASV_136_occurence_in_sites.pdf", width = 8, height = 6)
+p
+dev.off()
+

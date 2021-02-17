@@ -51,8 +51,8 @@ rL.site_spatial = HmscRandomLevel(sData = xycoords)
 #################
 #covariate matrix
 
-#winter andsummer freeze-thaw and freeze-thaw are not correlated so can run all vars together
-XData = full_metadata.sorted %>% dplyr::select("freezeThaw.mean_nongrowing", "freezeThaw.mean_growing", "total_seqs")
+#winter andsummer GDD and freeze-thaw are not correlated so can run all vars together
+XData = full_metadata.sorted %>% dplyr::select("HDD4.mean_nongrowing", "freezeThaw.mean_nongrowing", "ppt.mean_nongrowing","HDD4.mean_growing", "freezeThaw.mean_growing", "ppt.mean_growing", "total_seqs")
 XData[,colnames(XData) == "total_seqs"] = log(XData[,colnames(XData) == "total_seqs"])
 
 XData = apply(XData,2,scale)
@@ -140,7 +140,7 @@ head(m.spatial.full_covars$X)
 #For our real data we fit an intercept and three continuous variables, so they can each be assigned separate groups
 #If instead we had a categorical variable the levels could be assigned to a single group along with the intercept
 
-VP = computeVariancePartitioning(m.spatial.full_covars, group = c(1,2,3,4), groupnames = c("intercept","freeze-thaw nongrowing", "freeze-thaw growing", "total sequences"))
+VP = computeVariancePartitioning(m.spatial.full_covars, group = c(1,2,3,4,5,6,7,8), groupnames = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. nongrowing", "GDD growing", "freeze-thaw growing", "precip. growing","total sequences"))
 plotVariancePartitioning(m.spatial, VP = VP)
 
 ####################
@@ -157,14 +157,14 @@ plotTree = F, supportLevel = 0.95, split=.4, spNamesNumbers = c(T,F))
 
 VP.vals = data.frame(VP$vals)
 colnames(VP.vals) = c("Nf", "Nd")
-VP.vals = VP.vals[1:4,] #this removes the random effect
+VP.vals = VP.vals[1:8,] #this removes the random effect
 
 ##################
 #Multiply proportion variance by Turj R2
 VP.vals$Nf = VP.vals$Nf * MF$TjurR2[1]
 VP.vals$Nd = VP.vals$Nd * MF$TjurR2[2]
 
-VP.vals$variable = c("intercept","freeze-thaw nongrowing", "freeze-thaw growing", "total sequences")
+VP.vals$variable = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. nongrowing", "GDD growing", "freeze-thaw growing", "precip. growing","total sequences")
 VP.vals.long = VP.vals %>%
     pivot_longer(-variable, names_to = "ASV", values_to = "R2")
 
@@ -172,7 +172,7 @@ VP.vals.long = VP.vals %>%
 #Transform R2 based on positive or negative response
 postBeta.mean = data.frame(postBeta$mean)
 colnames(postBeta.mean) = c("Nf", "Nd")
-postBeta.mean$variable = c("intercept","freeze-thaw nongrowing", "freeze-thaw growing", "total sequences")
+postBeta.mean$variable = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. nongrowing", "GDD growing", "freeze-thaw growing", "precip. growing","total sequences")
 postBeta.mean.long = postBeta.mean %>%
 pivot_longer(-variable, names_to = "ASV", values_to = "mean")
 
@@ -185,14 +185,14 @@ pivot_longer(-variable, names_to = "ASV", values_to = "mean")
 
 postBeta.support = data.frame(postBeta$support)
 colnames(postBeta.support) = c("Nf", "Nd")
-postBeta.support$variable = c("intercept","freeze-thaw nongrowing", "freeze-thaw growing", "total sequences")
+postBeta.support$variable = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. nongrowing", "GDD growing", "freeze-thaw growing", "precip. growing","total sequences")
 postBeta.support.long = postBeta.support %>%
 pivot_longer(-variable, names_to = "ASV", values_to = "support")
 
 
 postBeta.supportNeg = data.frame(postBeta$supportNeg)
 colnames(postBeta.supportNeg) = c("Nf", "Nd")
-postBeta.supportNeg$variable = c("intercept","freeze-thaw nongrowing", "freeze-thaw growing", "total sequences")
+postBeta.supportNeg$variable = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. nongrowing", "GDD growing", "freeze-thaw growing", "precip. growing","total sequences")
 postBeta.supportNeg.long = postBeta.supportNeg %>%
 pivot_longer(-variable, names_to = "ASV", values_to = "supportNeg")
 
@@ -200,7 +200,6 @@ pivot_longer(-variable, names_to = "ASV", values_to = "supportNeg")
 VP.vals.support = full_join(VP.vals.long, postBeta.support.long) %>%
     full_join(., postBeta.supportNeg.long) %>%
     full_join(., postBeta.mean.long)
-
 VP.vals.support = data.frame(VP.vals.support)
 
 VP.vals.support$P.val = vector(mode = "character", length = length(VP.vals.support$support))
@@ -216,7 +215,7 @@ for(i in 1:length(VP.vals.support$P.val)){
 require(RColorBrewer)
 source("~/ggplot_theme.txt")
 
-VP.vals.support$variable = factor(VP.vals.support$variable, levels = c("intercept","freeze-thaw nongrowing", "freeze-thaw growing", "total sequences"))
+VP.vals.support$variable = factor(VP.vals.support$variable, levels = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. nongrowing", "GDD growing", "freeze-thaw growing", "precip. growing","total sequences"))
 
 VP.vals.support[VP.vals.support["ASV"] == "Nf", "ASV"] = "N. faginata"
 VP.vals.support[VP.vals.support["ASV"] == "Nd", "ASV"] = "N. ditissima"
@@ -230,7 +229,7 @@ VP.vals.support[VP.vals.support["ASV"] == "Nd", "ASV"] = "N. ditissima"
 #labs(
 #    x = "",
 #    y = "",
-#    fill = expression(paste("R"^2)),
+ #   fill = expression(paste("R"^2)),
 #    color = "support",
 #    title = "HMSC variance partitioning"
 #) +
@@ -238,6 +237,10 @@ VP.vals.support[VP.vals.support["ASV"] == "Nd", "ASV"] = "N. ditissima"
 #    legend.title = element_text(size = 20),
 #    axis.text = element_text(size = 18)
 #)
+
+#pdf("HMSC/Nf_Nd_variance_partitioning.nongrowing_v_growing.bin.spatial.pdf", width = 8, height = 6)
+#p1
+#dev.off()
 
 
 p1 = ggplot(VP.vals.support %>% filter(variable != "intercept"), aes(ASV, variable, size = R2, fill = mean, color = P.val)) +
@@ -263,11 +266,10 @@ legend.title = element_text(size = 20),
 axis.text = element_text(size = 18)
 )
 
-pdf("HMSC/Nf_Nd_variance_partitioning.nongrowing_v_growing_freeze-thaw.bin.spatial.pdf", width = 8, height = 6)
+
+pdf("HMSC/Nf_Nd_variance_partitioning.nongrowing_v_growing.GDD_freeze-thaw_precip.bin.spatial.mod.pdf", width = 8, height = 6)
 p1
 dev.off()
-
-#scale_fill_continuous(limits = c(-1,1))
 
 ####################
 ####################

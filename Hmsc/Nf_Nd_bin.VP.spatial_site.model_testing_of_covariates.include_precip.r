@@ -54,6 +54,9 @@ rL.site_spatial = HmscRandomLevel(sData = xycoords)
 XData = full_metadata.sorted %>% dplyr::select("HDD4.mean_nongrowing", "freezeThaw.mean_nongrowing", "ppt.mean_nongrowing", "duration_infection", "dbh", "Wax", "TreeCond", "total_seqs")
 XData[,colnames(XData) == "total_seqs"] = log(XData[,colnames(XData) == "total_seqs"])
 
+XData = apply(XData,2,scale)
+XData = data.frame(XData)
+
 m.spatial.full_covars = Hmsc(Y=yprob, XData=XData, XFormula=~.,
 studyDesign=studyDesign, ranLevels=list("sample"=rL.sample, "site_spatial" = rL.site_spatial),distr="probit")
 
@@ -136,7 +139,7 @@ head(m.spatial.full_covars$X)
 #For our real data we fit an intercept and three continuous variables, so they can each be assigned separate groups
 #If instead we had a categorical variable the levels could be assigned to a single group along with the intercept
 
-VP = computeVariancePartitioning(m.spatial.full_covars, group = c(1,2,3,4,5,6,7,8,9), groupnames = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. non-growing", "duration infection", "DBH", "beech scale", "crown dieback", "total sequences"))
+VP = computeVariancePartitioning(m.spatial.full_covars, group = c(1,2,3,4,5,6,7,8,9), groupnames = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. nongrowing", "duration of infection", "DBH", "beech scale", "crown dieback", "total sequences"))
 plotVariancePartitioning(m.spatial, VP = VP)
 
 ####################
@@ -155,7 +158,12 @@ VP.vals = data.frame(VP$vals)
 colnames(VP.vals) = c("Nf", "Nd")
 VP.vals = VP.vals[1:9,] #this removes the random effect
 
-VP.vals$variable = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. non-growing", "duration infection", "DBH", "beech scale", "crown dieback", "total sequences")
+##################
+#Multiply proportion variance by Turj R2
+VP.vals$Nf = VP.vals$Nf * MF$TjurR2[1]
+VP.vals$Nd = VP.vals$Nd * MF$TjurR2[2]
+
+VP.vals$variable = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. nongrowing", "duration of infection", "DBH", "beech scale", "crown dieback", "total sequences")
 VP.vals.long = VP.vals %>%
     pivot_longer(-variable, names_to = "ASV", values_to = "R2")
 
@@ -163,33 +171,34 @@ VP.vals.long = VP.vals %>%
 #Transform R2 based on positive or negative response
 postBeta.mean = data.frame(postBeta$mean)
 colnames(postBeta.mean) = c("Nf", "Nd")
-postBeta.mean$variable = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. non-growing", "duration infection", "DBH", "beech scale", "crown dieback", "total sequences")
+postBeta.mean$variable = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. nongrowing", "duration of infection", "DBH", "beech scale", "crown dieback", "total sequences")
 postBeta.mean.long = postBeta.mean %>%
 pivot_longer(-variable, names_to = "ASV", values_to = "mean")
 
-for(i in 1:length(postBeta.mean.long$mean)){
-    if(postBeta.mean.long$mean[i] < 0){
-        VP.vals.long$R2[i] = VP.vals.long$R2[i] * -1
-    }
-}
+#for(i in 1:length(postBeta.mean.long$mean)){
+#    if(postBeta.mean.long$mean[i] < 0){
+#        VP.vals.long$R2[i] = VP.vals.long$R2[i] * -1
+#    }
+#}
 
 
 postBeta.support = data.frame(postBeta$support)
 colnames(postBeta.support) = c("Nf", "Nd")
-postBeta.support$variable = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. non-growing", "duration infection", "DBH", "beech scale", "crown dieback", "total sequences")
+postBeta.support$variable = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. nongrowing", "duration of infection", "DBH", "beech scale", "crown dieback", "total sequences")
 postBeta.support.long = postBeta.support %>%
 pivot_longer(-variable, names_to = "ASV", values_to = "support")
 
 
 postBeta.supportNeg = data.frame(postBeta$supportNeg)
 colnames(postBeta.supportNeg) = c("Nf", "Nd")
-postBeta.supportNeg$variable = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. non-growing", "duration infection", "DBH", "beech scale", "crown dieback", "total sequences")
+postBeta.supportNeg$variable = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. nongrowing", "duration of infection", "DBH", "beech scale", "crown dieback", "total sequences")
 postBeta.supportNeg.long = postBeta.supportNeg %>%
 pivot_longer(-variable, names_to = "ASV", values_to = "supportNeg")
 
 
 VP.vals.support = full_join(VP.vals.long, postBeta.support.long) %>%
-    full_join(., postBeta.supportNeg.long)
+    full_join(., postBeta.supportNeg.long) %>%
+    full_join(., postBeta.mean.long)
 VP.vals.support = data.frame(VP.vals.support)
 
 VP.vals.support$P.val = vector(mode = "character", length = length(VP.vals.support$support))
@@ -205,34 +214,70 @@ for(i in 1:length(VP.vals.support$P.val)){
 require(RColorBrewer)
 source("~/ggplot_theme.txt")
 
-VP.vals.support$variable = factor(VP.vals.support$variable, levels = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. non-growing", "duration infection", "DBH", "beech scale", "crown dieback", "total sequences"))
+VP.vals.support$variable = factor(VP.vals.support$variable, levels = c("intercept","GDD nongrowing", "freeze-thaw nongrowing", "precip. nongrowing", "duration of infection", "DBH", "beech scale", "crown dieback", "total sequences"))
 
 VP.vals.support[VP.vals.support["ASV"] == "Nf", "ASV"] = "N. faginata"
 VP.vals.support[VP.vals.support["ASV"] == "Nd", "ASV"] = "N. ditissima"
 
-p1 = ggplot(VP.vals.support %>% filter(variable != "intercept"), aes(ASV, variable, fill = R2, color = P.val)) +
-geom_tile(size = 1, height = 0.975, width = 0.975) +
+#p1 = ggplot(VP.vals.support %>% filter(variable != "intercept"), aes(ASV, variable, fill = R2, color = P.val)) +
+#geom_tile(size = 1, height = 0.975, width = 0.975) +
+#scale_fill_gradient2(low = "#2c7bb6", high = "#d7191c", mid = "white", midpoint = 0) +
+#scale_color_manual(values = c("P<0.05" = "black", "n.s." = "white")) +
+#guides(color = guide_legend(override.aes = list(fill = "grey"))) +
+#my_gg_theme +
+#labs(
+#    x = "",
+#    y = "",
+#    fill = expression(paste("R"^2)),
+#    color = "support",
+#    title = "HMSC variance partitioning"
+#) +
+#theme(
+#    legend.title = element_text(size = 20),
+#    axis.text = element_text(size = 18)
+#)
+
+#pdf("HMSC/Nf_Nd_variance_partitioning.bin.spatial.with_precip.pdf", width = 8, height = 6)
+#p1
+#dev.off()
+
+
+VP.vals.support$ASV = factor(VP.vals.support$ASV, levels = c("N. faginata", "N. ditissima"))
+
+p1 = ggplot(VP.vals.support %>% filter(variable != "intercept"), aes(ASV, variable, size = R2, fill = mean, color = P.val)) +
+geom_point(shape = 21, stroke = 1.5) +
 scale_fill_gradient2(low = "#2c7bb6", high = "#d7191c", mid = "white", midpoint = 0) +
-scale_color_manual(values = c("P<0.05" = "black", "n.s." = "white")) +
+#scale_fill_gradientn(colours = c("#2c7bb6", "white", "#d7191c"),
+#values = scales::rescale(c(-0.25, -.15,-0.1,-0.05,-0.025, 0 ,0.025, 0.05, 0.1,0.25)))  +
+scale_color_manual(values = c("P<0.05" = "black", "n.s." = "white"), labels = c("P<0.05" = "P>0.95", "n.s." = "n.s.")) +
 guides(color = guide_legend(override.aes = list(fill = "grey"))) +
+scale_size_continuous(range= c(5,25), breaks = c(0,0.05,0.15), limits = c(0,0.2))+
 my_gg_theme +
+guides(
+color = guide_legend(override.aes = list(size = 5, shape = 21, fill = "dark grey")),
+size = guide_legend(override.aes = list(shape = 16, color = "dark grey"))
+)+
 labs(
-    x = "",
-    y = "",
-    fill = expression(paste("R"^2)),
-    color = "support",
-    title = "HMSC variance partitioning"
+x = "",
+y = "",
+size = expression(paste("R"^2)),
+color = "Support",
+fill = "Slope"
+#title = "HMSC variance partitioning"
 ) +
 theme(
-    legend.title = element_text(size = 20),
-    axis.text = element_text(size = 18)
-)
+legend.title = element_text(size = 20),
+axis.text = element_text(size = 18),
+axis.text.x = element_text(face = "italic"),
+legend.key = element_rect(fill = "white"))
 
-pdf("HMSC/Nf_Nd_variance_partitioning.bin.spatial.with_precip.pdf", width = 8, height = 6)
+
+pdf("HMSC/Nf_Nd_variance_partitioning.bin.spatial.with_precip.mod.pdf", width = 8.5, height = 7)
 p1
 dev.off()
 
-#scale_fill_continuous(limits = c(-1,1))
+
+write.table(VP.vals.support, "Nf_Nd_variance_partitioning.bin.spatial.include_precip.VP_table.txt", row.names = F, sep = "\t", quote = F)
 
 ####################
 ####################
