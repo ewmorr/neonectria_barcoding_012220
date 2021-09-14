@@ -42,7 +42,7 @@ xycoords = matrix(c(site_info$lat, site_info$lon),ncol=2)
 colnames(xycoords) = c("x-coordinate","y-coordinate")
 rownames(xycoords) = site_info$Site
 
-studyDesign = data.frame(sample = as.factor(full_metadata.sorted$sample), site_spatial = as.factor(full_metadata.sorted$Site))
+studyDesign = data.frame(sample = as.factor(full_metadata.sorted$sample), site_spatial = as.factor(as.character(full_metadata.sorted$Site)))
 
 rL.sample = HmscRandomLevel(units = as.factor(full_metadata.sorted$sample))
 rL.site_spatial = HmscRandomLevel(sData = xycoords)

@@ -1,7 +1,7 @@
 
 source("~/repo/neonectria_barcoding_012220/ecol/read_ASV_dat.LULU_tab.r")
 
-Nf_v_Nd.bin.metadata.gt1K = filter(Nf_v_Nd.bin.metadata, total_seqs > 999)
+Nf_v_Nd.bin.metadata.gt1K = filter(Nf_v_Nd.bin.metadata, total_seqs > 999 & sample != "BP79")
 
 
 Nd.freq = sum(Nf_v_Nd.bin.metadata.gt1K$Nd)/nrow(Nf_v_Nd.bin.metadata.gt1K)

@@ -226,7 +226,7 @@ p1 = ggplot(tree_cond_table.start_end, aes(ymin = start, ymax = end, x = as.fact
     annotate(geom="segment", x = 0.4, xend = 4.6, y = 1, yend = 1) +
 #    annotate(geom = "text", x = c(1,2,3,4), y = rep(1.05, 4), label = treeCond_n$n, size = 6) +
 #    coord_cartesian(ylim = c(0,1), clip = "off") +
-    labs(x = "Tree condition", y = "Trees (proportion)", title = "A") +
+    labs(x = "Tree condition class", y = "Trees (proportion)", title = "A") +
     my_gg_theme +
     theme(
         plot.title = element_text(hjust = -0.25, margin = margin(b = -20))
@@ -241,7 +241,7 @@ geom_text(y = 1.05, size = 6, color = "black") +
 annotate(geom="segment", x = 0.4, xend = 4.6, y = 1, yend = 1) +
 #    annotate(geom = "text", x = c(1,2,3,4), y = rep(1.05, 4), label = treeCond_n$n, size = 6) +
 #    coord_cartesian(ylim = c(0,1), clip = "off") +
-    labs(x = "Cankers", y = "Trees (proportion)", title = "B") +
+    labs(x = "Canker abundance class", y = "Trees (proportion)", title = "B") +
     my_gg_theme +
     theme(
         plot.margin = margin(l = 25, t = 5, ,r = 5,b = 5),
@@ -252,7 +252,7 @@ annotate(geom="segment", x = 0.4, xend = 4.6, y = 1, yend = 1) +
     )
 
 
-pdf("offset_bars_tree_cond_cankers.pdf", width = 8, height = 4)
+pdf("offset_bars_tree_cond_cankers.new_x_titles.pdf", width = 8, height = 4)
 grid.arrange(p1, p2, widths = c(0.525, 0.475) )
 dev.off()
 
