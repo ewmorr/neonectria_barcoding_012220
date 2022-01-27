@@ -3,7 +3,7 @@ install for 3prime trim mod of itsxpress
 ### stand-alone install (use when root priviledges are unavailable)
 
 ```
-conda create -n trim_3p pip hmmer bbmap vsearch biopython
+conda create -n trim_3p pip hmmer bbmap vsearch=2.18.0 biopython
 conda activate trim_3p
 ```
 clone itsxpress from ewmorr github,  switch to 3p_trim branch, and then install
