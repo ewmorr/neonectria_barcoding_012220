@@ -1,7 +1,7 @@
 install for 3prime trim mod of itsxpress
 
 ### stand-alone install (use when root priviledges are unavailable)
-
+### Note vsearch version <= 2.19 is required
 ```
 conda create -n trim_3p pip hmmer bbmap vsearch=2.18.0 biopython
 conda activate trim_3p
